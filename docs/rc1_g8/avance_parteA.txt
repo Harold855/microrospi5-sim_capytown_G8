@@ -1,0 +1,154 @@
+RC-1 · GRUPO 8 · S-003 — AVANCE DE LA PARTE A (CONOCER EL SIMULADOR)
+Fecha de la sesión: 11-nov-2026
+Para: todo el grupo. Sirve de registro de lo hecho y de punto de partida de la Parte B.
+
+======================================================================
+1. RESUMEN
+======================================================================
+- Entorno listo: Windows 11 + WSL2 Ubuntu 22.04 + ROS 2 Humble, simulador yahboomcar_sim compilado.
+- El simulador corre en la arena abierta arena_rc1 con noise:=high, y /odom publica a ~48-50 Hz.
+- E1 (1 pt) del verificador: 100 % (sim_log.txt y rqt_graph en el repo, rama claude/sleepy-knuth-kc6wex, commit fbe7226).
+- PENDIENTE de la Parte A: el paso 5 del PDF (comprobar que el robot frena solo a los 0.5 s sin /cmd_vel).
+  Lo ideal es hacerlo y anotarlo en sim_log.txt antes de dar la Parte A por cerrada (ver sección 6).
+
+======================================================================
+2. ENTORNO (lo que se instaló y el problema que hubo)
+======================================================================
+- WSL2 con Ubuntu 22.04, carpeta de trabajo ~/Robotica_RC1 (dentro de Linux, NO en /mnt/c: es muy lento).
+- Se descomprimió microrospi5pc.zip (simulador del docente) en ~/Robotica_RC1/microrospi5pc.
+- Se ejecutó instalar_en_wsl.sh: descargó ~608 MB (ros-humble-desktop, navigation2, slam-toolbox, teleop, etc.).
+- PROBLEMA: apt falló con "Conflicting values set for option Signed-By" para packages.ros.org.
+  Causa: el script añadía /etc/apt/sources.list.d/ros2.list con una clave distinta a la del repositorio de ROS
+  que ya estaba registrado.
+  Solución: se borró /etc/apt/sources.list.d/ros2.list y se ejecutó una copia del script sin el bloque que añade
+  el repositorio (instalar_sin_repo.sh). Con eso apt volvió a funcionar.
+  Si alguien del grupo repite la instalación en otra máquina y ve el mismo error, aplicar lo mismo.
+- Compilación con colcon: yahboomcar_description y yahboomcar_sim, 2 paquetes, sin errores (4.06 s).
+- Nota: "ros2 --version" no existe como opción; para comprobar ROS usar "ros2 pkg list | grep yahboomcar_sim"
+  (después de "source ~/.bashrc" o en una terminal nueva).
+- Python: numpy y matplotlib disponibles (los necesitan cierre_real.py --png y 09_plot_csv.py).
+
+======================================================================
+3. QUÉ SE EJECUTÓ (Parte A del reto, pasos 2 a 4)
+======================================================================
+Terminal 1 (simulador, arena abierta, ruido alto para que se note que /odom miente):
+  ros2 launch yahboomcar_sim sim.launch.py world:=arena_rc1 start:=1.0,1.0,0.0 robot_radius:=0.14 noise:=high
+  -> RViz abrió con la arena, el robot, la cámara simulada y el lidar (puntos rojos en las paredes).
+
+Terminal 2 (verificación; la salida se guardó con tee en sim_log.txt):
+  ros2 topic list
+  ros2 topic hz /odom        (timeout de 8 s)
+  ros2 topic echo /sim/pose --once
+
+Terminal 3 (cinta métrica virtual, lanzada ANTES de mover el robot):
+  python3 docs/rc1/cierre_real.py --csv csv/sim_a.csv
+  Con teleop_twist_keyboard (Terminal 2) se recorrió a mano un cuadrado de ~1 m. Ctrl+C en la Terminal 3 al terminar.
+
+======================================================================
+4. QUÉ SE OBTUVO
+======================================================================
+4.1 Topics publicados (24)
+  /beep /camera/camera_info /camera/image_raw /cmd_vel /goal_pose /imu/data_raw /initialpose /joint_states /map
+  /map_updates /odom /parameter_events /race/hud /race/hud_array /race/track_markers /robot_description /rosout
+  /scan /sim/collision /sim/pose /tf /tf_static /vel_raw /voltage
+
+4.2 Frecuencia de /odom (ventanas sucesivas de ros2 topic hz)
+  49.963, 49.966, 48.948, 47.779, 48.212, 48.514 Hz
+  Intervalo mínimo 0.001 s, máximo hasta 0.043 s. Cumple el "≈ 50 Hz" de la rúbrica (E1).
+  Observación: la frecuencia baja a ~47.8 Hz en algún momento. Es carga de CPU de WSL. El README del simulador
+  avisa de que con la CPU saturada el temporizador del nodo PID se atrasa y la derivada (Kd) da resultados falsos.
+  => En la Parte B, correr UNA prueba a la vez.
+
+4.3 Pose real al inicio (/sim/pose, frame map)
+  x = 1.0, y = 1.0, z = 0.0, orientación w = 1.0 (yaw 0): coincide con start:=1.0,1.0,0.0.
+
+4.4 Grafo de nodos (plots/rqt_graph_sim.png)
+  teleop_twist_keyboard -> /cmd_vel -> /yahboomcar_sim -> /odom, /sim/pose, /sim/collision, /scan, /imu/data_raw,
+  /camera/image_raw, /camera/camera_info, /vel_raw, /voltage, /map, /tf.
+  /yahboomcar_sim además recibe /beep e /initialpose. Es la idea central del reto: /odom es lo que el robot CREE y
+  /sim/pose es lo que PASÓ (solo existe en el simulador).
+
+4.5 Cierre de un cuadrado manual con ruido alto (cierre_real.py, una corrida de cada una)
+  Corrida   Duración   Cierre /odom   Cierre REAL   Yaw /odom   Yaw REAL
+  1         232.4 s    15.9 cm        3.0 cm        360.3 deg   356.4 deg
+  2         124.5 s    33.4 cm        53.6 cm       406.0 deg   364.1 deg
+
+  Lectura (con cuidado):
+  - Las dos corridas se contradicen: en la 1 el cierre real fue MEJOR que el de /odom, en la 2 fue PEOR.
+  - Se manejó a mano mirando RViz, o sea corrigiendo con la posición real a la vista. Esto sesga el cierre real
+    hacia valores pequeños. No es una medición controlada y no se puede usar como evidencia de la magnitud.
+  - Lo que sí se ve: en la corrida 2 el yaw de /odom (406°) se separó 42° del real (364°). Es el efecto del piso con
+    noise:=high: empuja y gira al robot, y /odom no lo ve. Esto hay que explicarlo en el informe.
+  - La segunda corrida sobrescribió csv/sim_a.csv (mismo nombre). Los números de la corrida 1 quedaron solo en
+    sim_log.txt. El CSV no se subió al repo (no es parte del entregable).
+
+======================================================================
+5. EN EL REPOSITORIO
+======================================================================
+- Repo clonado en WSL: ~/Robotica_RC1/microrospi5-sim_capytown_G8, rama claude/sleepy-knuth-kc6wex.
+  (El repo es privado: git pide usuario y, como contraseña, un token de acceso personal de GitHub.)
+- Commit fbe7226 "RC-1 Parte A: sim_log.txt y captura de rqt_graph (E1)":
+    sim_log.txt            topic list, hz /odom, /sim/pose y los dos cierres manuales con su nota
+    plots/rqt_graph_sim.png
+- Verificador (python3 scripts/rc1_verificar.py): E1 al 100 % (3 de 3). Es un avance estimado, NO la nota.
+
+======================================================================
+6. CONTROL DE LA PARTE A CONTRA EL PDF DEL RETO
+======================================================================
+ Paso 1  Instalar el entorno (WSL2 + instalar_en_wsl.sh)                         HECHO
+ Paso 2  Lanzar la arena (noise:=high)                                           HECHO
+ Paso 3  topic list, hz /odom, echo /sim/pose guardados en sim_log.txt           HECHO
+         captura de rqt_graph                                                    HECHO
+ Paso 4  cierre_real.py + cuadrado manual; anotar cierre /odom y REAL            HECHO (2 corridas)
+ Paso 5  Dejar de publicar /cmd_vel y comprobar que el robot se detiene solo
+         a los 0.5 s                                                             PENDIENTE
+ Rúbrica E1 (1 pt): arena lanzada, /odom ≈ 50 Hz, sim_log.txt con la diferencia
+ odom vs. real y captura de rqt_graph                                            CUMPLIDA
+
+ Cómo cerrar el paso 5 (con el simulador abierto):
+   ros2 topic pub --once /cmd_vel geometry_msgs/msg/Twist "{linear: {x: 0.3}}"
+   sleep 1; ros2 topic echo /vel_raw --once
+ El robot recibe una orden y, al no llegar otra en 0.5 s, el simulador pone v = w = 0 (cmd_timeout = 0.5 s, ver
+ sim_node.py). La salida de /vel_raw debe mostrar velocidades ~0. Anotar el resultado en sim_log.txt.
+ Esto también es una pregunta del banco de defensa ("¿por qué el nodo frena si no llega /odom en 0.5 s y por qué
+ el simulador frena si no llega /cmd_vel?").
+
+======================================================================
+7. PREGUNTAS DE DEFENSA QUE YA SE PUEDEN RESPONDER CON LO VISTO
+======================================================================
+- ¿Qué es /sim/pose, por qué no existe en el robot real y qué la reemplaza allí? Es la pose REAL del simulador
+  (verdad terreno). En el robot real no existe: la verdad la mide la cinta métrica.
+- ¿Qué es el empuje del piso y por qué /odom no lo ve? Una velocidad aleatoria que cambia cada ~0.4 s y solo actúa
+  cuando el robot se mueve; /odom integra lo que miden las ruedas menos ese empuje. El sensor que sí ve el giro
+  causado es el giroscopio del IMU (/imu/data_raw, angular_velocity.z).
+- ¿Qué diferencia hay entre el cierre del nodo y el medido con cinta? El del nodo sale de /odom; el real, de
+  /sim/pose (en el robot, de la cinta).
+
+======================================================================
+8. PARTE B: LO QUE SIGUE (EXPERIMENTO 1, 2 pt)
+======================================================================
+Antes de ejecutar nada:
+  a) Escribir docs/rc1_g8/predicciones_rc1.md (4 preguntas del PDF). Se escribe ANTES de correr y no se corrige
+     después. Las predicciones deben ser del grupo.
+  b) Copiar el nodo del curso a ~/Robotica_RC1/microrospi5-sim_capytown_G8/scripts_pdi/ (scripts_pdi.zip del docente;
+     git lo ignora, no se sube). Debe contener core_cuadrado.py y cuadrado_controller.py.
+  c) Esta vez el simulador con ruido bajo (valor de trabajo del RC-1):
+       ros2 launch yahboomcar_sim sim.launch.py world:=arena_rc1 start:=1.0,1.0,0.0 robot_radius:=0.14 noise:=low
+  d) Una prueba a la vez y UN solo parámetro por prueba. Los decimales llevan punto (kd:=0.0, no kd:=0).
+
+Pruebas (recta de 2 m, arranca 10 cm a la izquierda de la línea, sesgo de motores 0.06 rad/s):
+  1A bang-bang   controlador:=bangbang
+  1B solo P      kd:=0.0
+  1C P + D       (Kp 3, Kd 4, valores por defecto)
+  1D PID         ki:=0.5      -> el error final debe ser <= 2 cm (E2)
+Cada una con:  experimento:=recta line_offset:=0.10 bias_w:=0.06 log_csv:=csv/exp1X_sim.csv
+Entre pruebas: ros2 service call /sim/reset std_srvs/srv/Empty  y reiniciar el nodo.
+Ejemplo (desde la raíz del repo):
+  python3 scripts_pdi/cuadrado_controller.py --ros-args $(python3 scripts/rc1_args.py simulador experimento=recta line_offset=0.10 bias_w=0.06 ki=0.5 log_csv=csv/exp1d_sim.csv)
+Gráfica de cada CSV:
+  PYTHONPATH=scripts_pdi python3 docs/rc1/09_plot_csv.py csv/exp1d_sim.csv --experimento recta
+  (anotar |e| medio, t de asentamiento ±2 cm y error final en la hoja; el PNG se mueve a plots/)
+Detalle completo en docs/rc1_g8/matriz_pruebas.md. Para ver el avance: python3 scripts/rc1_verificar.py
+
+Roles según el reto: Integración (simulador, repo, bags), Control (ganancias, config/rc1_pid.yaml),
+Planificación (predicciones, matriz de pruebas), Percepción (gráficas con 09_plot_csv.py y cierre_real.py).
