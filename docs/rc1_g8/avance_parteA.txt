@@ -50,17 +50,65 @@ Rama claude/sleepy-knuth-kc6wex del repositorio microrospi5-sim_capytown_G8:
   - scripts/rc1_verificar.py (muestra cuánto falta para la entrega; la Parte A ya da 100 %)
 
 ----------------------------------------------------------------------
-4. LO QUE SIGUE: PARTE B (EXPERIMENTO 1, ARREGLAR UNA LÍNEA)
+4. CÓMO REPRODUCIR LA PARTE A
 ----------------------------------------------------------------------
-Antes de empezar hay que hacer dos cosas:
-  1) Escribir las predicciones (docs/rc1_g8/predicciones_rc1.md) ANTES de correr cualquier prueba. No se pueden
-     cambiar después.
-  2) Copiar el nodo del curso (scripts_pdi del docente) a la carpeta del repositorio.
+Hacen falta 3 terminales de Ubuntu (WSL) abiertas a la vez. Abrir otra es abrir "Ubuntu" de nuevo desde el menú
+de Windows. No cerrar la terminal 1 mientras se trabaja.
 
-Luego se corren 4 pruebas en el simulador con ruido bajo (noise:=low), una a la vez, cambiando un solo
-parámetro cada vez. El robot arranca 10 cm al lado de una línea y el controlador debe llevarlo a ella:
-  1A  bang-bang
-  1B  solo P
-  1C  P + D
-  1D  PID completo  ->  meta: error final de 2 cm o menos
-De cada prueba se guarda el archivo CSV y la gráfica. Los pasos exactos están en docs/rc1_g8/matriz_pruebas.md.
+Antes de empezar (una sola vez):
+  - Windows 11 con WSL2 y Ubuntu 22.04. Trabajar dentro de Linux (carpeta ~/Robotica_RC1), no en /mnt/c.
+  - Descomprimir microrospi5pc.zip y ejecutar: bash instalar_en_wsl.sh
+    (si da el error de claves de apt: borrar /etc/apt/sources.list.d/ros2.list y repetir con el script sin la
+    parte que añade el repositorio, como se hizo aquí).
+  - Clonar el repositorio del grupo y entrar a su carpeta:
+      cd ~/Robotica_RC1
+      git clone -b claude/sleepy-knuth-kc6wex https://github.com/Harold855/microrospi5-sim_capytown_G8.git
+      cd microrospi5-sim_capytown_G8
+    (git pide usuario y, como contraseña, un token de acceso personal de GitHub.)
+  - Comprobar que ROS ve el simulador: ros2 pkg list | grep yahboomcar_sim
+
+Paso 1 - TERMINAL 1: abrir el simulador (déjalo abierto)
+      ros2 launch yahboomcar_sim sim.launch.py world:=arena_rc1 start:=1.0,1.0,0.0 robot_radius:=0.14 noise:=high
+  Debe abrirse RViz con la arena, el robot, la cámara y el lidar.
+
+Paso 2 - TERMINAL 2: comprobar que todo publica y guardar el resultado en sim_log.txt
+      { echo "=== topic list"; ros2 topic list; echo "=== hz /odom"; timeout 8 ros2 topic hz /odom; echo "=== sim/pose"; ros2 topic echo /sim/pose --once; } 2>&1 | tee sim_log.txt
+  Se espera: /odom cerca de 50 Hz y /sim/pose en x = 1.0, y = 1.0.
+
+Paso 3 - Captura del grafo de nodos
+  Con el teclado funcionando (paso 4), abrir:  rqt_graph
+  Cambiar el desplegable a "Nodes/Topics (all)", desmarcar "Dead sinks" y "Leaf topics", pulsar refrescar y guardar la
+  imagen con el botón de guardar como plots/rqt_graph_sim.png.
+
+Paso 4 - Cuadrado manual y cierre odometría vs. real
+  TERMINAL 3 (iniciarla ANTES de mover el robot):
+      python3 docs/rc1/cierre_real.py --csv csv/sim_a.csv
+  TERMINAL 2 (teclado):
+      ros2 run teleop_twist_keyboard teleop_twist_keyboard
+      i = avanzar, j = girar a la izquierda, l = a la derecha, k = parar, z/x = bajar velocidad
+  Recorrer un cuadrado de ~1 m volviendo al punto de inicio. Al terminar, Ctrl+C en la terminal 3: imprime
+  "cierre según /odom" y "cierre REAL". Anotar ambos números en sim_log.txt.
+  Usar un nombre distinto de CSV en cada corrida (sim_a.csv se sobrescribe).
+
+Paso 5 - Comprobar que el robot frena solo (TERMINAL 2, robot parado; pegar el bloque entero de una vez)
+      rm -f /tmp/vel_paso5.txt
+      ( timeout 4 ros2 topic echo /vel_raw --field linear.x > /tmp/vel_paso5.txt ) &
+      sleep 1
+      ros2 topic pub --once /cmd_vel geometry_msgs/msg/Twist "{linear: {x: 0.3}}"
+      wait
+      grep -v -- '---' /tmp/vel_paso5.txt | awk '{v=$1; n++; if(v>0.01){if(!s)s=n; e=n; if(v>m)m=v}} END{printf "muestras=%d  vmax=%.3f m/s  movimiento: muestra %d a %d (~%.2f s a 50 Hz)\n", n, m, s, e, (e-s+1)/50}'
+  Se espera un movimiento de ~0.5 a 0.7 s: el robot arranca y se detiene sin que se mande ninguna orden de parada.
+  Anotar el resultado en sim_log.txt.
+
+Paso 6 - Guardar en el repositorio
+      git add sim_log.txt plots/rqt_graph_sim.png
+      git commit -m "RC-1 Parte A"
+      git pull --rebase origin claude/sleepy-knuth-kc6wex
+      git push
+  Comprobar el avance con:  python3 scripts/rc1_verificar.py   (E1 debe dar 100 %)
+
+Errores que ya ocurrieron (para no repetirlos):
+  - Pegar dos comandos pegados en una línea los rompe. Un comando por línea.
+  - Lanzar el registro del paso 5 dos veces sobrescribe el archivo: hacerlo todo en un solo bloque.
+  - Si "git push" dice "rejected", hacer primero "git pull --rebase" y volver a subir.
+  - No confiar en los números del cuadrado manual como medición: se maneja mirando la pantalla.
