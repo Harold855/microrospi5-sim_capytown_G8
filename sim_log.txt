@@ -58,3 +58,9 @@ pose:
 corrida 1 (232.4 s): cierre /odom 15.9 cm yaw 360.3 deg | cierre REAL 3.0 cm yaw 356.4 deg
 corrida 2 (124.5 s): cierre /odom 33.4 cm yaw 406.0 deg | cierre REAL 53.6 cm yaw 364.1 deg
 nota: manejo manual mirando RViz; las dos corridas no coinciden en el signo de la diferencia; el yaw de /odom se separa del real hasta 42 deg en la corrida 2.
+
+=== paso 5: frenado por falta de /cmd_vel (noise:=high)
+Orden: ros2 topic pub --once /cmd_vel geometry_msgs/msg/Twist "{linear: {x: 0.3}}" (una sola vez, sin orden de parada).
+Registro de /vel_raw linear.x (50 Hz): 121 muestras, vmax = 0.489 m/s, movimiento de ~0.58 s (muestras 41 a 69).
+El robot avanzo y se detuvo solo. Causa: sim_node.py, cmd_timeout = 0.5 s; sin otro /cmd_vel en 0.5 s el simulador ordena v = w = 0.
+vmax (0.489) > orden (0.3): probable empuje del piso de noise:=high (0.10 m/s rms), que /odom no ve. No verificado con noise:=none.
