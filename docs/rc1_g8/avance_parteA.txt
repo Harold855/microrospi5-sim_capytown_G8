@@ -8,8 +8,8 @@ Para: todo el grupo. Sirve de registro de lo hecho y de punto de partida de la P
 - Entorno listo: Windows 11 + WSL2 Ubuntu 22.04 + ROS 2 Humble, simulador yahboomcar_sim compilado.
 - El simulador corre en la arena abierta arena_rc1 con noise:=high, y /odom publica a ~48-50 Hz.
 - E1 (1 pt) del verificador: 100 % (sim_log.txt y rqt_graph en el repo, rama claude/sleepy-knuth-kc6wex, commit fbe7226).
-- PENDIENTE de la Parte A: el paso 5 del PDF (comprobar que el robot frena solo a los 0.5 s sin /cmd_vel).
-  Lo ideal es hacerlo y anotarlo en sim_log.txt antes de dar la Parte A por cerrada (ver sección 6).
+- Paso 5 del PDF (el robot frena solo a los 0.5 s sin /cmd_vel): HECHO y anotado en sim_log.txt (ver sección 6).
+- PARTE A CERRADA: los 5 pasos del PDF están hechos y la rúbrica E1 se cumple.
 
 ======================================================================
 2. ENTORNO (lo que se instaló y el problema que hubo)
@@ -101,17 +101,21 @@ Terminal 3 (cinta métrica virtual, lanzada ANTES de mover el robot):
          captura de rqt_graph                                                    HECHO
  Paso 4  cierre_real.py + cuadrado manual; anotar cierre /odom y REAL            HECHO (2 corridas)
  Paso 5  Dejar de publicar /cmd_vel y comprobar que el robot se detiene solo
-         a los 0.5 s                                                             PENDIENTE
+         a los 0.5 s                                                             HECHO
  Rúbrica E1 (1 pt): arena lanzada, /odom ≈ 50 Hz, sim_log.txt con la diferencia
  odom vs. real y captura de rqt_graph                                            CUMPLIDA
 
- Cómo cerrar el paso 5 (con el simulador abierto):
-   ros2 topic pub --once /cmd_vel geometry_msgs/msg/Twist "{linear: {x: 0.3}}"
-   sleep 1; ros2 topic echo /vel_raw --once
- El robot recibe una orden y, al no llegar otra en 0.5 s, el simulador pone v = w = 0 (cmd_timeout = 0.5 s, ver
- sim_node.py). La salida de /vel_raw debe mostrar velocidades ~0. Anotar el resultado en sim_log.txt.
- Esto también es una pregunta del banco de defensa ("¿por qué el nodo frena si no llega /odom en 0.5 s y por qué
- el simulador frena si no llega /cmd_vel?").
+ Resultado del paso 5 (noise:=high):
+   Se mandó UNA sola orden: ros2 topic pub --once /cmd_vel geometry_msgs/msg/Twist "{linear: {x: 0.3}}"
+   y se registró /vel_raw linear.x (50 Hz, update_rate = 50): 121 muestras, vmax = 0.489 m/s, movimiento de
+   ~0.58 s (muestras 41 a 69). El robot avanzó y se detuvo solo, sin orden de parada.
+   Causa: sim_node.py, cmd_timeout = 0.5 s; si no llega otro /cmd_vel en 0.5 s, el simulador ordena v = w = 0.
+   vmax (0.489) es mayor que la orden (0.3): probable empuje del piso de noise:=high (0.10 m/s rms), que /odom
+   no ve. No se verificó con noise:=none (debería dar ~0.3).
+   Esto es una pregunta del banco de defensa ("¿por qué el nodo frena si no llega /odom en 0.5 s y por qué el
+   simulador frena si no llega /cmd_vel?").
+   Nota de proceso: el primer intento perdió la captura (se lanzó el registro dos veces y la segunda sobrescribió
+   el archivo). Se repitió con un solo bloque de comandos.
 
 ======================================================================
 7. PREGUNTAS DE DEFENSA QUE YA SE PUEDEN RESPONDER CON LO VISTO
