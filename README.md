@@ -69,14 +69,15 @@ El nodo de la clase (`scripts_pdi/cuadrado_controller.py` y `core_cuadrado.py`) 
 ## RC-1 · Grupo 8 (S-003) — entrega del grupo
 
 > Esta sección es del grupo; el resto del README es del simulador del docente.
-> Mientras diga `[COMPLETAR]`, `python3 scripts/rc1_verificar.py` la marca como pendiente.
+> Mientras diga `[COMPLETAR]`, `python3 scripts/rc1_verificar.py` la marca como pendiente. La columna "Trabajo realizado" la completa cada integrante con lo que hizo de verdad.
 
-| Integrante | Rol en RC-1 |
-|---|---|
-| Jorge Rivera | Control (ganancias y `config/rc1_pid.yaml`) |
-| Harold Payco | Integración (simulador, bringup, repositorio y tag, bags) |
-| Sebastián Escobar | Percepción (gráficas y `cierre_real.py`) |
-| [COMPLETAR: 4.º integrante] | Planificación (predicciones, matriz de pruebas, mediciones con cinta) |
+| N.º | Integrante | Rol | Responsabilidad en RC-1 (según el reto) | Trabajo realizado |
+|---|---|---|---|---|
+| 1 | Jorge Rivera | Control | Ganancias Kp, Ki y Kd de la línea y del giro; orden de sintonía; `config/rc1_pid.yaml` (simulador y robot real por separado) | [COMPLETAR] |
+| 2 | Harold Payco | Integración y planificación | Simulador y bringup (`ROS_DOMAIN_ID`), repositorio y tag, bags del robot real, hoja de resultados; predicciones, matriz de pruebas y secuencia de seguridad | Instaló WSL2 + ROS 2 + el simulador y ejecutó la Parte A (`sim_log.txt`, `rqt_graph`, cuadrado manual, frenado a los 0.5 s); mantiene el repositorio y la rama de entrega |
+| 3 | Sebastián Escobar | Percepción | Gráficas con `09_plot_csv.py` y `cierre_real.py`; comparación entre lo que dice `/odom` y lo real | [COMPLETAR] |
+
+> En el RC-0 el grupo fue de 3 personas, con Planificación unida a Integración; se mantiene igual en el RC-1.
 
 | | |
 |---|---|
