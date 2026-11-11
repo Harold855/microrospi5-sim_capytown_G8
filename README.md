@@ -63,3 +63,33 @@ El nodo de la clase (`scripts_pdi/cuadrado_controller.py` y `core_cuadrado.py`) 
 - **No probado:** `sim.launch.py` completo con RViz sobre `arena_rc1`, Nav2 con el simulador, y todo lo del robot real.
 - Con muchas pruebas en paralelo la CPU se satura y el PID da resultados falsos: correr una a la vez (o ≤ 5).
 - El simulador **no** modela el derrape de las 4 ruedas ni el retardo de `/odom`.
+
+---
+
+## RC-1 · Grupo 8 (S-003) — entrega del grupo
+
+> Esta sección es del grupo; el resto del README es del simulador del docente.
+> Mientras diga `[COMPLETAR]`, `python3 scripts/rc1_verificar.py` la marca como pendiente.
+
+| Integrante | Rol en RC-1 |
+|---|---|
+| Jorge Rivera | Control (ganancias y `config/rc1_pid.yaml`) |
+| Harold Payco | Integración (simulador, bringup, repositorio y tag, bags) |
+| Sebastián Escobar | Percepción (gráficas y `cierre_real.py`) |
+| [COMPLETAR: 4.º integrante] | Planificación (predicciones, matriz de pruebas, mediciones con cinta) |
+
+| | |
+|---|---|
+| Robot / dominio | RosCar 4 · `ROS_DOMAIN_ID=8` (Pi y simulador) |
+| Nivel de ruido | `noise:=low` de trabajo; 1 corrida por prueba con `noise:=medium` |
+| Ganancias finales | [COMPLETAR] — simulador y robot real, por separado, en `config/rc1_pid.yaml` |
+| Odometría del robot real | `/odom` publicada por `odom_corrector` con `r = 0.03145`, `b_eff = 0.2138` (calibración del RC-0) |
+
+**Archivos del RC-1:** `config/rc1_pid.yaml`, `hoja_resultados.csv`, `csv/`, `plots/`, `bags/`, `sim_log.txt`, `informe.pdf` y `docs/rc1_g8/` (matriz de pruebas, predicciones, tabla de transferencia, plantilla del informe).
+
+**Nodo del curso:** `cuadrado_controller.py` y `core_cuadrado.py` (de `scripts_pdi.zip` del docente) se copian a `scripts_pdi/`, carpeta que git ignora. Se ejecutan desde la raíz del repo:
+
+```bash
+python3 scripts_pdi/cuadrado_controller.py --ros-args $(python3 scripts/rc1_args.py simulador experimento=cuadrado log_csv=csv/exp3b_sim_run1.csv)
+python3 scripts/rc1_verificar.py          # qué falta para la entrega (avance estimado)
+```

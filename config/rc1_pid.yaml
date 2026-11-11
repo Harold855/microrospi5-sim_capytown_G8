@@ -1,0 +1,45 @@
+# RC-1 · Grupo 8 · S-003 · RosCar 4 — ganancias del nodo cuadrado_controller (curso)
+#
+# Dos bloques, uno por planta, porque el simulador y el robot real se sintonizan por separado
+# (el reto lo exige). Cada bloque trae `estado:`. Mientras diga PENDIENTE, los valores son solo
+# el punto de partida (los de fábrica del nodo del curso) y NO las ganancias finales.
+# Cuando el grupo termine de sintonizar: poner los valores finales y cambiar `estado:` a FINAL.
+#
+# Uso (imprime las banderas -p con el punto decimal que exige ROS 2):
+#   python3 scripts/rc1_args.py simulador experimento=cuadrado log_csv=csv/exp3b_sim_run1.csv
+#   python3 cuadrado_controller.py --ros-args $(python3 scripts/rc1_args.py robot_real experimento=giro90)
+# Un parámetro por prueba: anota cada cambio en hoja_resultados.csv (columna notas).
+
+simulador:
+  estado: PENDIENTE            # PENDIENTE | FINAL
+  planta: "yahboomcar_sim, arena_rc1, noise:=low (valor de trabajo)"
+  cuadrado_controller:
+    ros__parameters:
+      linear_speed: 0.20       # m/s
+      kp: 3.0                  # línea (error en m)
+      ki: 0.0
+      kd: 4.0
+      kp_yaw: 3.0              # giro (error en rad)
+      ki_yaw: 0.0
+      kd_yaw: 0.4
+      integral_limit: 0.5      # anti-windup
+      max_angular: 2.0         # rad/s
+      bias_w: 0.0              # solo se inyecta en las pruebas del simulador (1A-1D, 3B, 3C)
+      line_offset: 0.0         # 0.10 en la recta del Experimento 1
+
+robot_real:
+  estado: PENDIENTE            # PENDIENTE | FINAL
+  planta: "RosCar 4, ROS_DOMAIN_ID=8, /odom de odom_corrector (r=0.03145, b_eff=0.2138 del RC-0)"
+  cuadrado_controller:
+    ros__parameters:
+      linear_speed: 0.10       # velocidades suaves al inicio (Anexo C); subir solo tras un giro90 correcto
+      kp: 3.0                  # partida: ganancias del simulador (Parte E.4); re-sintonizar, máx. 3 veces
+      ki: 0.0
+      kd: 4.0                  # OJO: /odom real ~11 Hz con timer de 30 Hz: Kd puede hacer vibrar w
+      kp_yaw: 3.0
+      ki_yaw: 0.0
+      kd_yaw: 0.4
+      integral_limit: 0.5
+      max_angular: 1.0
+      bias_w: 0.0              # NO usar en el robot real: ya trae su propio sesgo
+      line_offset: 0.0         # 0.10 en la recta

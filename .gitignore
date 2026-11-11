@@ -14,3 +14,6 @@ build/
 install/
 log/
 docs/rc1/figuras/cuadrado_odom_vs_real.png
+
+# RC-1 (Grupo 8): nodo y simulador de Python del docente (scripts_pdi.zip). Se copia localmente, no se versiona.
+scripts_pdi/
