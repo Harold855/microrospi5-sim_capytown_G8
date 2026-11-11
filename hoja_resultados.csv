@@ -1,1 +1,5 @@
 prueba,planta,noise,kp,ki,kd,kp_yaw,ki_yaw,kd_yaw,prediccion,cierre_odom_cm,cierre_real_cm,yaw_acum_deg,notas
+1A,sim,low,-,-,-,,,,"El robot cruzará repetidamente la línea virtual, generando un zigzag persistente sin asentarse de manera estable (escrita tras una corrida exploratoria: csv/exp1a_sim_exploratoria.csv)",,,,corrida exploratoria previa: e_medio_cm=6.85; t_as_s=no se asienta; e_fin_cm=0.75
+1B,sim,low,3.0,0.0,0.0,,,,"Con Kp=3, Ki=0 y Kd=0, esperamos oscilaciones alrededor de un equilibrio desplazado por el sesgo angular, con al menos dos cruces de la línea virtual",,,,
+1C,sim,low,3.0,0.0,4.0,,,,"Manteniendo el mismo Kp y añadiendo Kd=4, esperamos una disminución progresiva de las oscilaciones, pero con un error lateral residual de aproximadamente 2 cm",,,,
+1D,sim,low,3.0,0.5,4.0,,,,"Manteniendo Kp=3 y Kd=4, al añadir Ki=0.5 esperamos reducir el error residual y terminar a menos de 2 cm de la línea virtual",,,,
