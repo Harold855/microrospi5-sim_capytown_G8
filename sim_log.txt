@@ -1,0 +1,60 @@
+=== topic list
+/beep
+/camera/camera_info
+/camera/image_raw
+/cmd_vel
+/goal_pose
+/imu/data_raw
+/initialpose
+/joint_states
+/map
+/map_updates
+/odom
+/parameter_events
+/race/hud
+/race/hud_array
+/race/track_markers
+/robot_description
+/rosout
+/scan
+/sim/collision
+/sim/pose
+/tf
+/tf_static
+/vel_raw
+/voltage
+=== hz /odom
+average rate: 49.963
+	min: 0.001s max: 0.029s std dev: 0.00561s window: 52
+average rate: 49.966
+	min: 0.001s max: 0.031s std dev: 0.00637s window: 102
+average rate: 48.948
+	min: 0.001s max: 0.042s std dev: 0.00700s window: 149
+average rate: 47.779
+	min: 0.001s max: 0.043s std dev: 0.00756s window: 194
+average rate: 48.212
+	min: 0.001s max: 0.043s std dev: 0.00721s window: 244
+average rate: 48.514
+	min: 0.001s max: 0.043s std dev: 0.00692s window: 295
+=== sim/pose
+header:
+  stamp:
+    sec: 1794364975
+    nanosec: 96828712
+  frame_id: map
+pose:
+  position:
+    x: 1.0
+    y: 1.0
+    z: 0.0
+  orientation:
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+---
+
+=== cierre manual con teleop, noise:=high (cierre_real.py, una corrida de cada)
+corrida 1 (232.4 s): cierre /odom 15.9 cm yaw 360.3 deg | cierre REAL 3.0 cm yaw 356.4 deg
+corrida 2 (124.5 s): cierre /odom 33.4 cm yaw 406.0 deg | cierre REAL 53.6 cm yaw 364.1 deg
+nota: manejo manual mirando RViz; las dos corridas no coinciden en el signo de la diferencia; el yaw de /odom se separa del real hasta 42 deg en la corrida 2.
