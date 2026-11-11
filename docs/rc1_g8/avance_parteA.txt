@@ -1,0 +1,114 @@
+RC-1 · GRUPO 8 — AVANCE DE LA PARTE A (CONOCER EL SIMULADOR)
+Fecha: 10-nov-2026 (hora de Perú; Parte A entre 21:42 y 22:22)
+
+ESTADO: PARTE A TERMINADA. Ahora seguimos con la Parte B.
+
+----------------------------------------------------------------------
+1. QUÉ SE HIZO
+----------------------------------------------------------------------
+- Se instaló el simulador en Windows 11 con WSL2 (Ubuntu 22.04 + ROS 2 Humble) y se compiló sin errores.
+  Hubo un problema al instalar (apt daba un error de claves del repositorio de ROS); se resolvió borrando el
+  archivo /etc/apt/sources.list.d/ros2.list y usando una copia del script de instalación sin esa parte.
+- Se abrió el simulador en la arena de 4 x 4 m con ruido alto (noise:=high). Se ve el robot, la cámara y el lidar en RViz.
+- Se comprobó que el simulador publica la información del robot (topics) y se guardó en sim_log.txt.
+- Se hizo una captura del grafo de nodos (rqt_graph).
+- Se manejó el robot a mano con el teclado haciendo un cuadrado de ~1 m y se midió cuánto "se equivoca" la odometría.
+- Se comprobó que el robot frena solo si deja de recibir órdenes.
+
+----------------------------------------------------------------------
+2. QUÉ SE OBTUVO (VALORES IMPORTANTES)
+----------------------------------------------------------------------
+a) Frecuencia de la odometría (/odom): entre 47.8 y 50.0 Hz. Cumple lo que pide el reto (~50 Hz).
+   Detalle a tener en cuenta: baja un poco a veces porque la computadora se carga. Por eso, en la Parte B hay que
+   correr UNA sola prueba a la vez.
+
+b) Posición inicial real del robot: x = 1.0, y = 1.0, mirando al frente (como se pidió en el lanzamiento).
+
+c) El grafo de nodos muestra lo central del reto: el teclado manda órdenes (/cmd_vel) al simulador, y el simulador
+   publica la odometría (/odom, lo que el robot CREE) y la posición real (/sim/pose, lo que REALMENTE pasó).
+   /sim/pose solo existe en el simulador; en el robot real la verdad se mide con cinta métrica.
+
+d) Cuadrado manual con ruido alto (una corrida de cada, a mano mirando la pantalla):
+        Cierre según /odom   Cierre REAL   Giro total /odom   Giro total REAL
+   #1        15.9 cm            3.0 cm         360.3°             356.4°
+   #2        33.4 cm           53.6 cm         406.0°             364.1°
+   Lectura: las dos corridas se contradicen, porque se manejó mirando la posición real. No sirven como medición
+   formal. Lo importante: en la #2 la odometría marcó 406° de giro cuando el robot giró 364°, o sea 42° de error.
+   Es el efecto del piso irregular: empuja y gira al robot, y la odometría no se entera.
+
+e) El robot frena solo: se envió UNA orden de avance (0.3 m/s) y no se mandó nada más. El robot avanzó unos 0.58 s
+   y se detuvo. Es porque el simulador pone velocidad cero si pasan 0.5 s sin recibir órdenes.
+   (La velocidad llegó a 0.49 m/s, más de lo ordenado; probablemente por el empuje del piso. No se comprobó.)
+
+----------------------------------------------------------------------
+3. QUÉ HAY EN EL REPOSITORIO
+----------------------------------------------------------------------
+Rama claude/sleepy-knuth-kc6wex del repositorio microrospi5-sim_capytown_G8:
+  - sim_log.txt              (topics, frecuencia, posición, cuadrados manuales y frenado)
+  - plots/rqt_graph_sim.png  (captura del grafo)
+  - docs/rc1_g8/             (este informe, matriz de pruebas, plantillas de predicciones, informe y transferencia)
+  - scripts/rc1_verificar.py (muestra cuánto falta para la entrega; la Parte A ya da 100 %)
+
+----------------------------------------------------------------------
+4. CÓMO REPRODUCIR LA PARTE A
+----------------------------------------------------------------------
+Hacen falta 3 terminales de Ubuntu (WSL) abiertas a la vez. Abrir otra es abrir "Ubuntu" de nuevo desde el menú
+de Windows. No cerrar la terminal 1 mientras se trabaja.
+
+Antes de empezar (una sola vez):
+  - Windows 11 con WSL2 y Ubuntu 22.04. Trabajar dentro de Linux (carpeta ~/Robotica_RC1), no en /mnt/c.
+  - Descomprimir microrospi5pc.zip y ejecutar: bash instalar_en_wsl.sh
+    (si da el error de claves de apt: borrar /etc/apt/sources.list.d/ros2.list y repetir con el script sin la
+    parte que añade el repositorio, como se hizo aquí).
+  - Clonar el repositorio del grupo y entrar a su carpeta:
+      cd ~/Robotica_RC1
+      git clone -b claude/sleepy-knuth-kc6wex https://github.com/Harold855/microrospi5-sim_capytown_G8.git
+      cd microrospi5-sim_capytown_G8
+    (git pide usuario y, como contraseña, un token de acceso personal de GitHub.)
+  - Comprobar que ROS ve el simulador: ros2 pkg list | grep yahboomcar_sim
+
+Paso 1 - TERMINAL 1: abrir el simulador (déjalo abierto)
+      ros2 launch yahboomcar_sim sim.launch.py world:=arena_rc1 start:=1.0,1.0,0.0 robot_radius:=0.14 noise:=high
+  Debe abrirse RViz con la arena, el robot, la cámara y el lidar.
+
+Paso 2 - TERMINAL 2: comprobar que todo publica y guardar el resultado en sim_log.txt
+      { echo "=== topic list"; ros2 topic list; echo "=== hz /odom"; timeout 8 ros2 topic hz /odom; echo "=== sim/pose"; ros2 topic echo /sim/pose --once; } 2>&1 | tee sim_log.txt
+  Se espera: /odom cerca de 50 Hz y /sim/pose en x = 1.0, y = 1.0.
+
+Paso 3 - Captura del grafo de nodos
+  Con el teclado funcionando (paso 4), abrir:  rqt_graph
+  Cambiar el desplegable a "Nodes/Topics (all)", desmarcar "Dead sinks" y "Leaf topics", pulsar refrescar y guardar la
+  imagen con el botón de guardar como plots/rqt_graph_sim.png.
+
+Paso 4 - Cuadrado manual y cierre odometría vs. real
+  TERMINAL 3 (iniciarla ANTES de mover el robot):
+      python3 docs/rc1/cierre_real.py --csv csv/sim_a.csv
+  TERMINAL 2 (teclado):
+      ros2 run teleop_twist_keyboard teleop_twist_keyboard
+      i = avanzar, j = girar a la izquierda, l = a la derecha, k = parar, z/x = bajar velocidad
+  Recorrer un cuadrado de ~1 m volviendo al punto de inicio. Al terminar, Ctrl+C en la terminal 3: imprime
+  "cierre según /odom" y "cierre REAL". Anotar ambos números en sim_log.txt.
+  Usar un nombre distinto de CSV en cada corrida (sim_a.csv se sobrescribe).
+
+Paso 5 - Comprobar que el robot frena solo (TERMINAL 2, robot parado; pegar el bloque entero de una vez)
+      rm -f /tmp/vel_paso5.txt
+      ( timeout 4 ros2 topic echo /vel_raw --field linear.x > /tmp/vel_paso5.txt ) &
+      sleep 1
+      ros2 topic pub --once /cmd_vel geometry_msgs/msg/Twist "{linear: {x: 0.3}}"
+      wait
+      grep -v -- '---' /tmp/vel_paso5.txt | awk '{v=$1; n++; if(v>0.01){if(!s)s=n; e=n; if(v>m)m=v}} END{printf "muestras=%d  vmax=%.3f m/s  movimiento: muestra %d a %d (~%.2f s a 50 Hz)\n", n, m, s, e, (e-s+1)/50}'
+  Se espera un movimiento de ~0.5 a 0.7 s: el robot arranca y se detiene sin que se mande ninguna orden de parada.
+  Anotar el resultado en sim_log.txt.
+
+Paso 6 - Guardar en el repositorio
+      git add sim_log.txt plots/rqt_graph_sim.png
+      git commit -m "RC-1 Parte A"
+      git pull --rebase origin claude/sleepy-knuth-kc6wex
+      git push
+  Comprobar el avance con:  python3 scripts/rc1_verificar.py   (E1 debe dar 100 %)
+
+Errores que ya ocurrieron (para no repetirlos):
+  - Pegar dos comandos pegados en una línea los rompe. Un comando por línea.
+  - Lanzar el registro del paso 5 dos veces sobrescribe el archivo: hacerlo todo en un solo bloque.
+  - Si "git push" dice "rejected", hacer primero "git pull --rebase" y volver a subir.
+  - No confiar en los números del cuadrado manual como medición: se maneja mirando la pantalla.

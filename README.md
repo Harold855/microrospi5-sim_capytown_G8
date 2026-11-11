@@ -1,3 +1,13 @@
+## Equipo — Grupo 8 (S-003)
+
+| Integrante | Rol | Trabajo realizado |
+|---|---|---|
+| Integrante 1 |  |  |
+| Integrante 2 |  |  |
+| Integrante 3 |  |  |
+
+---
+
 # microrospi5-sim · Simulador del robot Yahboom MicroROS-Pi5 + Reto RC-1 (control PID)
 
 Simulador **2D** en ROS 2 Humble que reemplaza al robot físico (`/cmd_vel` → `/odom`, `/scan`, IMU, cámara), se ve en RViz y trae pistas de carrera, piso irregular, odometría con error y un piloto automático con PID. Sirve para practicar en casa lo que luego se hace en el laboratorio con el robot real.
@@ -63,3 +73,21 @@ El nodo de la clase (`scripts_pdi/cuadrado_controller.py` y `core_cuadrado.py`) 
 - **No probado:** `sim.launch.py` completo con RViz sobre `arena_rc1`, Nav2 con el simulador, y todo lo del robot real.
 - Con muchas pruebas en paralelo la CPU se satura y el PID da resultados falsos: correr una a la vez (o ≤ 5).
 - El simulador **no** modela el derrape de las 4 ruedas ni el retardo de `/odom`.
+
+---
+
+| | |
+|---|---|
+| Robot / dominio | RosCar 4 · `ROS_DOMAIN_ID=8` (Pi y simulador) |
+| Nivel de ruido | `noise:=low` de trabajo; 1 corrida por prueba con `noise:=medium` |
+| Ganancias finales | [COMPLETAR] — simulador y robot real, por separado, en `config/rc1_pid.yaml` |
+| Odometría del robot real | `/odom` publicada por `odom_corrector` con `r = 0.03145`, `b_eff = 0.2138` (calibración del RC-0) |
+
+**Archivos del RC-1:** `config/rc1_pid.yaml`, `hoja_resultados.csv`, `csv/`, `plots/`, `bags/`, `sim_log.txt`, `informe.pdf` y `docs/rc1_g8/` (matriz de pruebas, predicciones, tabla de transferencia, plantilla del informe).
+
+**Nodo del curso:** `cuadrado_controller.py` y `core_cuadrado.py` (de `scripts_pdi.zip` del docente) se copian a `scripts_pdi/`, carpeta que git ignora. Se ejecutan desde la raíz del repo:
+
+```bash
+python3 scripts_pdi/cuadrado_controller.py --ros-args $(python3 scripts/rc1_args.py simulador experimento=cuadrado log_csv=csv/exp3b_sim_run1.csv)
+python3 scripts/rc1_verificar.py          # qué falta para la entrega (avance estimado)
+```
