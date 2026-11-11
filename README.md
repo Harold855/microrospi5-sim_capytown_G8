@@ -1,3 +1,13 @@
+## Equipo — Grupo 8 (S-003)
+
+| Integrante | Rol | Trabajo realizado |
+|---|---|---|
+| Integrante 1 |  |  |
+| Integrante 2 |  |  |
+| Integrante 3 |  |  |
+
+---
+
 # microrospi5-sim · Simulador del robot Yahboom MicroROS-Pi5 + Reto RC-1 (control PID)
 
 Simulador **2D** en ROS 2 Humble que reemplaza al robot físico (`/cmd_vel` → `/odom`, `/scan`, IMU, cámara), se ve en RViz y trae pistas de carrera, piso irregular, odometría con error y un piloto automático con PID. Sirve para practicar en casa lo que luego se hace en el laboratorio con el robot real.
