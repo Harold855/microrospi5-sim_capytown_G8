@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""rc1_tablas — tablas en Markdown de los Experimentos 1 y 2 a partir de la hoja y de los CSV (solo lectura).
+"""rc1_tablas — tablas en Markdown de los Experimentos 1, 2 y 3 a partir de la hoja y de los CSV (solo lectura).
 
 Los números salen de `hoja_resultados.csv` (columna `notas`) y, donde conviene, se recalculan de `csv/*.csv`
 (cruces de la línea, e mín/máx, yaw máximo). No inventa nada: lo que falta aparece como «—».
@@ -59,6 +59,93 @@ def giro(nombre):
     return str(cruces), f"{w:.2f}"
 
 
+def corridas3():
+    """Filas del Experimento 3 (sim) de la hoja: {(prueba, corrida): fila}."""
+    with open(os.path.join(RAIZ, "hoja_resultados.csv"), newline="", encoding="utf-8") as f:
+        return {(r["prueba"], r["notas"].split(";")[0].strip()): r for r in csv.DictReader(f)
+                if r["planta"] == "sim" and r["prueba"] in ("3A", "3B", "3C")}
+
+
+def num(x):
+    try:
+        return float(x)
+    except (TypeError, ValueError):
+        return None
+
+
+def pred3(texto):
+    m = re.search(r"/odom = ([\d.]+) cm; cierre REAL = ([\d.]+) cm", texto or "")
+    return (float(m.group(1)), float(m.group(2))) if m else (None, None)
+
+
+def exp3():
+    h = corridas3()
+    nom = {"3A": "3A lazo abierto", "3B": "3B PID sobre /odom", "3C": "3C PID + Ki"}
+    orden = ("run1", "run2", "run3", "medium")
+    out = ["### Experimento 3 — cuadrado de 2 x 2 m en el simulador\n",
+           "Cierre «`/odom`» = lo que cree el robot (y lo que imprime el nodo); cierre «real» = distancia a la marca de inicio según "
+           "`/sim/pose` (`cierre_real.py`). `\\|e\\|` medio = error lateral medio en las rectas, calculado de `csv/exp3*_sim_*.csv`.\n",
+           "| Prueba | Corrida | Ruido | Cierre `/odom` (cm) | Cierre real (cm) | Yaw real (°) | Yaw `/odom` (°) | \\|e\\| medio rectas (cm) | Tiempo (s) |",
+           "|---|---|---|---|---|---|---|---|---|"]
+    for p in ("3A", "3B", "3C"):
+        for c in orden:
+            r = h.get((p, c))
+            if not r:
+                continue
+            n = r["notas"]
+            e = [abs(float(x["e_line"])) * 100 for x in filas_csv(f"exp{p.lower()}_sim_{c}", "AVANZA")]
+            em = f"{sum(e) / len(e):.2f}" if e else "—"
+            tm = re.search(r"([\d.]+) s", n.split("FIN nodo:")[-1]) if "FIN nodo:" in n else None
+            out.append(f"| {p} | {c} | {r['noise']} | {r['cierre_odom_cm']} | {r['cierre_real_cm']} | {r['yaw_acum_deg']} | "
+                       f"{re.search(r'yaw odom ([\d.]+)', n).group(1) if re.search(r'yaw odom ([\d.]+)', n) else '—'} | {em} | {tm.group(1) if tm else '—'} |")
+    out.append("")
+    out.append("#### Resumen con `noise:=low` (3 corridas) y la corrida `medium`\n")
+    out.append("| Prueba | Real low: corridas (cm) | Real low: media | Real low: mín–máx | `/odom` low: media | Real medium (cm) | Corridas low ≤ 40 cm |")
+    out.append("|---|---|---|---|---|---|---|")
+    for p in ("3A", "3B", "3C"):
+        real = [num(h[(p, c)]["cierre_real_cm"]) for c in orden[:3] if (p, c) in h]
+        od = [num(h[(p, c)]["cierre_odom_cm"]) for c in orden[:3] if (p, c) in h]
+        med = h.get((p, "medium"), {}).get("cierre_real_cm", "—")
+        if None in real or not real:
+            continue
+        ok = sum(1 for x in real if x <= 40)
+        out.append(f"| {nom[p]} | {' / '.join(f'{x:g}' for x in real)} | **{sum(real) / len(real):.1f}** | {min(real):g}–{max(real):g} | "
+                   f"{sum(od) / len(od):.1f} | {med} | {ok} de {len(real)} |")
+    out.append("")
+    out.append("#### Predicción contra medición (cierre `/odom` / cierre real, cm)\n")
+    out.append("| Prueba | Corrida | Predijeron | Se midió | Diferencia real |")
+    out.append("|---|---|---|---|---|")
+    for p in ("3A", "3B", "3C"):
+        for c in ("run1", "medium"):
+            r = h.get((p, c))
+            if not r:
+                continue
+            po, pr = pred3(r["prediccion"])
+            if c == "run1":
+                c_txt, rr = "low (las 3 corridas)", [num(h[(p, k)]["cierre_real_cm"]) for k in orden[:3]]
+                ro = [num(h[(p, k)]["cierre_odom_cm"]) for k in orden[:3]]
+                med = f"{min(ro):g}–{max(ro):g} / {min(rr):g}–{max(rr):g}"
+                dif = "; ".join(f"{x - pr:+.1f}" for x in rr)
+            else:
+                c_txt, med = "medium", f"{r['cierre_odom_cm']} / {r['cierre_real_cm']}"
+                dif = f"{num(r['cierre_real_cm']) - pr:+.1f}"
+            out.append(f"| {p} | {c_txt} | {po:g} / {pr:g} | {med} | {dif} |")
+    out.append("")
+    out.append("Meta de la rúbrica (E4): 3B o 3C con cierre real ≤ 40 cm. La redacción no aclara si es cada corrida, la media o al menos una; "
+               "pendiente de confirmar con el docente.\n")
+    out.append("| Lectura de E4 | 3B | 3C |")
+    out.append("|---|---|---|")
+    for lectura, f in (("Cada corrida low ≤ 40 cm", lambda v: all(x <= 40 for x in v)),
+                       ("Media de las 3 low ≤ 40 cm", lambda v: sum(v) / len(v) <= 40),
+                       ("Al menos una corrida low ≤ 40 cm", lambda v: any(x <= 40 for x in v))):
+        fila = []
+        for p in ("3B", "3C"):
+            v = [num(h[(p, c)]["cierre_real_cm"]) for c in orden[:3]]
+            fila.append("✓" if f(v) else "✗")
+        out.append(f"| {lectura} | {fila[0]} | {fila[1]} |")
+    return out
+
+
 def main():
     h = hoja()
     out = []
@@ -92,6 +179,8 @@ def main():
         out.append(f"| {etiqueta} | {r['kp_yaw']} | {r['ki_yaw']} | {r['kd_yaw']} | {clave(n, 'sobre_pct')} | {clave(n, 't_as_s')} | {clave(n, 'e_fin_deg')} | {cr} | {w} |")
     out.append("")
     out.append("Meta de la rúbrica (E3): una combinación propia con sobreimpulso ≤ 10 % y asentamiento ≤ 3 s.")
+    out.append("")
+    out.extend(exp3())
     print("\n".join(out))
 
 

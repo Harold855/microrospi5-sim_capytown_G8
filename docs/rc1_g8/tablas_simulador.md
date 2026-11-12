@@ -1,5 +1,7 @@
 # RC-1 · Grupo 8 _ Roscar 4 — Tablas del simulador (Experimentos 1 y 2)
 
+> Las tablas del Experimento 3 (Parte D) están en `docs/rc1_g8/tablas_parteD.md`.
+
 Material para el informe y para el requisito de E2 y E3. Las tablas de medidas se generan con
 `python3 scripts/rc1_tablas.py` a partir de `hoja_resultados.csv` y de `csv/*.csv`.
 Todas las corridas son en la arena `arena_rc1` con `noise:=low`, una prueba a la vez y con el nodo del curso sin modificar.
