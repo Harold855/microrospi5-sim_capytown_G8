@@ -25,9 +25,9 @@ ros2 service call /sim/reset std_srvs/srv/Empty      # entre pruebas, y reinicia
 | 2a | `kp_yaw:=1.0 kd_yaw:=0.0` | `experimento:=giro90` | `csv/exp2a_sim.csv` | – |
 | 2b | `kp_yaw:=10.0 kd_yaw:=0.0` | idem | `csv/exp2b_sim.csv` | – |
 | 2c | `kp_yaw:=10.0 kd_yaw:=1.2` | idem | `csv/exp2c_sim.csv` | – |
-| 2p (propia) | ≥ 3 combinaciones de `kp_yaw`/`kd_yaw`/`ki_yaw`; la mejor va aquí | idem | `csv/exp2p_sim.csv` | sobreimpulso ≤ 25 %, asentamiento ≤ 3 s (E3) |
+| 2p (propia) | ≥ 3 combinaciones de `kp_yaw`/`kd_yaw`/`ki_yaw`; la mejor va aquí | idem | `csv/exp2p_sim.csv` | sobreimpulso ≤ 10 %, asentamiento ≤ 3 s (E3) |
 | 3A abierto | `experimento:=cuadrado_abierto` | – | `csv/exp3a_sim_run1..3.csv`, `_medium.csv` | – |
-| 3B odom+PID | `experimento:=cuadrado bias_w:=0.03` | – | `csv/exp3b_sim_run1..3.csv`, `_medium.csv` | 3B **o** 3C: cierre real ≤ 30 cm en las 3 (E4) |
+| 3B odom+PID | `experimento:=cuadrado bias_w:=0.03` | – | `csv/exp3b_sim_run1..3.csv`, `_medium.csv` | 3B **o** 3C: cierre real ≤ 40 cm en las 3 (E4) |
 | 3C PID+Ki | `experimento:=cuadrado ki:=0.5 bias_w:=0.05` | – | `csv/exp3c_sim_run1..3.csv`, `_medium.csv` | idem |
 
 Cada prueba 3x: 3 corridas con `noise:=low` y 1 con `noise:=medium` (`_medium`). Con `medium` el robot puede rozar una pared: si pasa, registrar la prueba como no terminada y explicar por qué.
@@ -46,10 +46,10 @@ Antes de encender nada leer el Anexo C del reto. Primera prueba con las ruedas e
 
 | Orden | Prueba | Parámetros | CSV | Bag |
 |---|---|---|---|---|
-| 1 | giro90 | ganancias del simulador, `linear_speed:=0.10 max_angular:=1.0` | `csv/exp2_real_giro90.csv` | – |
-| 2 | recta 1D | `experimento:=recta line_offset:=0.10`, **sin** `bias_w` | `csv/exp1d_real.csv` | – |
-| 3 | 3A ×1 | `experimento:=cuadrado_abierto` | `csv/exp3a_real.csv` | `bags/rc1_real_3a` |
-| 4 | 3B ×3 | `experimento:=cuadrado` | `csv/exp3b_real_run1..3.csv` | `bags/rc1_real_3b_run1..3` |
+| 1 | giro90 (E5) | ganancias del simulador, `linear_speed:=0.10 max_angular:=1.0` | `csv/exp2_real_giro90.csv` | – |
+| 2 | recta 1D ×3 (E6) | `experimento:=recta line_offset:=0.10`, **sin** `bias_w` | `csv/exp1d_real_run1..3.csv` | – |
+| 3 | 3A ×1 (E7) | `experimento:=cuadrado_abierto` | `csv/exp3a_real.csv` | `bags/rc1_real_3a` |
+| 4 | 3B ×3 (E7) | `experimento:=cuadrado` | `csv/exp3b_real_run1..3.csv` | `bags/rc1_real_3b_run1..3` |
 
 ```bash
 ros2 topic hz /odom ; ros2 node list | grep -i ekf      # sin EKF: dejar /odom (no usar /odom_raw: evita r y b_eff del RC-0)
@@ -57,7 +57,11 @@ ros2 bag record /odom /cmd_vel /tf -o bags/rc1_real_3b_run1
 ```
 
 Medir con cinta (de la marca de inicio al centro del robot) y con transportador (ángulo final). Anotar en la hoja: `cierre_real_cm` y `yaw_acum_deg`.
-Umbral E5: cierre real medio de 3B ≤ 25 cm (la cátedra puede ajustarlo tras el primer turno). Bonus: 3B ≤ 10 cm sin recalibrar, más 3A para comparar.
+Umbrales de la rúbrica vigente (`RC1_Control_PID_2026-2.docx`; la cátedra puede ajustarlos tras el primer turno):
+- **E5** (2 pt): giro90 real, error final ≤ 3° medido con transportador. En la hoja: `e_fin_deg=` en `notas` de la fila `2` (planta `real`).
+- **E6** (2 pt): recta 1D real, 3 corridas, desvío lateral final ≤ 5 cm con cinta. En la hoja: `desvio_cm=` en `notas` de cada fila `1D` real.
+- **E7** (4 pt): cuadrado real, 3A una vez y 3B tres veces, con cinta y bags; cierre medio de 3B ≤ 25 cm **y menor que el de 3A**. En la hoja: `cierre_real_cm`.
+- **Bonus** (+2): demostración frente al docente, sin recalibrar: 3B ≤ 10 cm, más 3A para comparar.
 
 ## Hoja de resultados
 
