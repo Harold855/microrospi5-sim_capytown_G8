@@ -28,7 +28,7 @@ simulador:
       line_offset: 0.0         # 0.10 en la recta del Experimento 1
 
 robot_real:
-  estado: PENDIENTE            # PENDIENTE | FINAL
+  estado: PENDIENTE            # PENDIENTE | FINAL  (giro: partida 2p1 con max_angular 1.0; recta y cuadrado aún sin decidir)
   planta: "RosCar 4, ROS_DOMAIN_ID=8, /odom de odom_corrector (r=0.03145, b_eff=0.2138 del RC-0)"
   cuadrado_controller:
     ros__parameters:
@@ -36,9 +36,9 @@ robot_real:
       kp: 3.0                  # partida: ganancias del simulador (Parte E.4); re-sintonizar, máx. 3 veces
       ki: 0.0
       kd: 4.0                  # OJO: /odom real ~11 Hz con timer de 30 Hz: Kd puede hacer vibrar w
-      kp_yaw: 3.0
+      kp_yaw: 10.0             # partida E5: combinación 2p1 del simulador (decisión del grupo)
       ki_yaw: 0.0
-      kd_yaw: 0.4
+      kd_yaw: 0.6
       integral_limit: 0.5
       max_angular: 1.0
       bias_w: 0.0              # NO usar en el robot real: ya trae su propio sesgo
