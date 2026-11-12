@@ -1,0 +1,12 @@
+/odom_corrector:
+  ros__parameters:
+    base_frame: base_footprint
+    firmware_wheel_radius: 0.0325
+    firmware_wheel_separation: 0.24
+    input_topic: /odom_raw
+    odom_frame: odom
+    output_topic: /odom
+    publish_tf: true
+    use_sim_time: false
+    wheel_radius: 0.03145
+    wheel_separation: 0.2138
