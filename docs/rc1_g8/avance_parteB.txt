@@ -27,7 +27,7 @@ ESTADO: PARTE B TERMINADA (rúbrica E2 cumplida). Sigue la Parte C: giro de 90°
 Resultados de las cuatro pruebas (error lateral a la línea, en cm):
 
   Prueba            |e| medio   |e| máximo   Cruces de la línea   Asentamiento ±2 cm       Error final
-  1A bang-bang        6.27         11.27           2               no se asienta             1.92
+  1A bang-bang        6.27         11.27           3               no se asienta             1.92
   1B solo P           6.03         10.69           2               no se asienta             1.65
   1C P + D            3.10         10.00           0               no se asienta (*)         2.14
   1D PID              2.53         10.00           1               5.80 s                    0.30
