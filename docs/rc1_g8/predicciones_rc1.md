@@ -1,6 +1,6 @@
 # RC-1 — Predicciones previas (Grupo 8, S-003)
 
-**Proyecto:** CapyTown RC-1 — Control PID: del simulador al robot real  
+**Proyecto:** CapyTown RC-1 - Control PID: del simulador al robot real  
 **ROS_DOMAIN_ID:** 8  
 **Fecha y hora de registro:** 10/11/26 23:16:15
 
