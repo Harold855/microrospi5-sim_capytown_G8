@@ -169,7 +169,7 @@ def evaluar(raiz):
     it.append(Item("E5", "CSV del giro90 real (csv/exp2_real_giro90.csv)", contar(raiz, [f"csv/{s}.csv" for s in REAL_GIRO]), 1))
     fg = filas(hoja, "2", "real")
     it.append(Item("E5", "fila de la hoja (prueba 2, planta real)", int(bool(fg)), 1))
-    eg = kv(fg[0].get("notas")).get("e_fin_deg") if fg else None
+    eg = kv(fg[-1].get("notas")).get("e_fin_deg") if fg else None   # la ultima fila es la vigente (las anteriores son configuraciones previas)
     it.append(Item("E5", "regla: error final del giro real <= 3 grados, con transportador (notas: e_fin_deg=; la catedra puede ajustar)",
                    int(eg is not None and eg <= 3.0), 1, "sin dato" if eg is None else f"e_fin_deg={eg}"))
 
