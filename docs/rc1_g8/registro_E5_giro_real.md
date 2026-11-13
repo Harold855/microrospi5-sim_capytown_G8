@@ -85,3 +85,10 @@ Una corrida adicional con las mismas ganancias (`kp_yaw` 1.0, `kd_yaw` 0.6, `max
 Del CSV: `FIN` a 5.33 s; pico de `/odom` 88.7° (sin sobreimpulso); primer instante con `|e_yaw|` < 2° a 5.07 s; `w` = 0.000 en `FIN`; **19 inversiones de signo de `w` (|w| ≥ 0.05) en los 2 s previos** (el criterio de la predicción 4, ≤ 2, no se cumple, igual que en `r1`–`r3`; son órdenes pequeñas, no una oscilación visible).
 
 Resumen de las siete corridas con transportador (85°, 90°, 87°, 83°, 93°, 91°, 88°): media 88.1°, desviación ≈ 3.5°; 5 de 7 dentro de ±3° (fallan 85° y 83°; 83° se anotó como «mal posicionado»). Si las corridas fueran independientes con esa tasa (≈ 70 %), la probabilidad de que tres seguidas cumplan sería ≈ 35 % [estimación aproximada con una muestra pequeña; 87° y 93° están justo en el límite y una lectura de ±1° cambia el resultado].
+
+## Lo que dice el documento oficial sobre E5 (`RC1_Control_PID_2026-2.docx`)
+- Parte E: «**Prueba corta primero:** giro90 con las ganancias del simulador pero con velocidades suaves (`-p linear_speed:=0.10 -p max_angular:=1.0`). Medir el giro con transportador.» No indica un número de corridas.
+- Rúbrica E5 (2 pt): «Robot real, arranque y giro de 90°: bringup con `/odom` verificado, giro90 con transportador y error final ≤ 3°. **[Cátedra: ajustar.]**» En singular. En cambio, E6 dice «3 corridas» y E7 «3A una vez y 3B tres veces».
+- Lo que respondió el docente (las tres corridas deben cumplir) es una lectura más estricta, que el propio documento permite («Cátedra: ajustar»). Conviene pedirle que lo confirme por escrito.
+- Parte E también pide: verificar `/odom` (`topic hz`, `topic echo --once`) y revisar si hay EKF; «si no aparece, usar `-p odom_topic:=/odom_raw` y anotarlo». Aquí no hay EKF y se usó `/odom` (salida de `odom_corrector` con la calibración propia); debe anotarse así.
+- Tabla de ajustes del documento: «El giro queda 1–2° corto → sesgo y Ki = 0 → `ki_yaw` pequeño».
