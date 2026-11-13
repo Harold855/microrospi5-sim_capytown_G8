@@ -92,3 +92,13 @@ Resumen de las siete corridas con transportador (85°, 90°, 87°, 83°, 93°, 9
 - Lo que respondió el docente (las tres corridas deben cumplir) es una lectura más estricta, que el propio documento permite («Cátedra: ajustar»). Conviene pedirle que lo confirme por escrito.
 - Parte E también pide: verificar `/odom` (`topic hz`, `topic echo --once`) y revisar si hay EKF; «si no aparece, usar `-p odom_topic:=/odom_raw` y anotarlo». Aquí no hay EKF y se usó `/odom` (salida de `odom_corrector` con la calibración propia); debe anotarse así.
 - Tabla de ajustes del documento: «El giro queda 1–2° corto → sesgo y Ki = 0 → `ki_yaw` pequeño».
+
+## 13-nov-2026 — aclaración final del docente (criterios del repositorio y de la sustentación)
+Respuesta del docente (transcrita por el grupo):
+- **E5:** con **una prueba** es suficiente; no exige tres. (Sustituye a su respuesta anterior de que las tres debían cumplir.)
+- **E6:** 3 corridas, evaluando que el **desvío lateral final sea menor de 5 cm**.
+- **E7:** cuadrado de 2 × 2 m en dos partes: **A, una corrida; B, tres corridas**.
+- Lo anterior es la calificación del **repositorio**.
+- En la **sustentación en vivo** se hace **una sola corrida de cada parte (E5 a E7)**, más el **BONUS**, por el tiempo y el número de grupos. Esas corridas en vivo cuentan como calificación de sustentación, que se complementa con la sustentación del código.
+
+Corridas de E5 con transportador (todas siguen registradas): 85°, 90°, 87° (serie 1) y 83° (mal posicionado), 93°, 91° (serie oficial) y 88° (corrida adicional con video). Con el criterio de una prueba suficiente, la evidencia de E5 debe citar **una** corrida concreta y, a la vez, listar todas las demás sin ocultar las que quedaron fuera de ±3°.
