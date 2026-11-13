@@ -57,3 +57,21 @@ Tres corridas hechas **después** de subir las predicciones de `predicciones_E5_
 
 Resumen: físico medio 87.3°, desviación estándar muestral ≈ 2.5° (error estándar de la media ≈ 1.5°). Cociente θ_odom/θ_real por corrida: 1.041, 0.991, 1.017 (media 1.016). Con esa dispersión la diferencia de la media respecto de 90° (≈ 2.7°) no es estadísticamente distinguible de cero con 3 corridas, y recalcular `wheel_separation` movería el valor solo ≈ 1.6 % (0.2138 → ≈ 0.217). Observación del grupo: el robot «se acomodó» solo hasta ajustarse a ≈ 90°.
 Pendiente: decidir con el docente si E5 se evalúa por una corrida o por el promedio, y registrar las corridas oficiales con un CSV distinto por corrida.
+
+## 13-nov-2026 — serie oficial de E5 (`kp_yaw` 1.0, `r1`, `r2`, `r3`) y contraste con las predicciones
+CSV: `csv/exp2_real_giro90_r1.csv`, `_r2.csv`, `_r3.csv` (la corrida 1 se guardó primero como `cal2.csv` por un `N` olvidado y se copió a `r1`). Gráficas: `plots/exp2_real_giro90_r1.png`, `_r2.png`, `_r3.png`. Ángulo físico reportado por el grupo con transportador circular; la corrida 1 se anotó como «mal posicionado».
+
+| Corrida | `FIN` (s) | Yaw `/odom` en `FIN` (°) | Pico de `/odom` (°) | Físico (°) | Error físico (°) |
+|---|---|---|---|---|---|
+| 1 | 6.10 | 89.0 | 89.0 | 83 (mal posicionado) | 7 |
+| 2 | 6.50 | 88.2 | 88.2 | 93 | 3 |
+| 3 | 5.60 | 88.5 | 88.5 | 91 | 1 |
+
+Primer instante con `|e_yaw|` < 2°: 5.83, 6.23 y 5.33 s.
+
+### Predicciones frente a lo medido (CSV)
+1. **Asentamiento ≈ 6 s:** `FIN` a 6.10, 6.50 y 5.60 s. Se cumple.
+2. **Sobreimpulso ≈ 1° (91° según `/odom`):** el máximo de `/odom` fue 89.0°, 88.2° y 88.5°; **no hay sobreimpulso** (la predicción de +1° no se cumple; el robot termina antes de 90°, en la banda de ±2° del nodo).
+3. **Ángulo físico 75°–95°; E5 si 87°–93°:** las tres medidas caen en el rango (83°, 93°, 91°). Cumplen el criterio de ±3° la corrida 2 (93°, en el límite) y la 3 (91°); la 1 (83°) no.
+4. **Comportamiento final:** `w` = 0.000 en `FIN` en las tres (se cumple). El criterio de «como máximo 2 inversiones de signo de `w` (|w| ≥ 0.05) en los 2 s previos a `FIN`» **no se cumple**: 5, 5 y 16 inversiones. Magnitud: la cola de la respuesta tiene órdenes pequeñas (|w| ≲ 0.25 rad/s; en r1 el robot queda ≈ 1 s con `e` ≈ 2.3° y `w` ≈ 0.04 rad/s, probablemente por debajo de la zona muerta de los motores) y el `FIN` ocurre a 1–2° del objetivo, en el borde de la tolerancia. Es el efecto de la derivada con `/odom` a ≈ 11 Hz.
+Lectura de E5 pendiente de la respuesta del docente (una corrida, promedio o al menos una).
