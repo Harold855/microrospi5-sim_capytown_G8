@@ -31,7 +31,7 @@ SIM_RECTA = ["exp1a_sim", "exp1b_sim", "exp1c_sim", "exp1d_sim"]
 SIM_GIRO = ["exp2a_sim", "exp2b_sim", "exp2c_sim", "exp2p_sim"]
 SIM_CUAD = [f"exp3{l}_sim_{r}" for l in "abc" for r in RUNS]
 SIM_CINTA = [f"exp3{l}_sim_cinta_{r}" for l in "abc" for r in RUNS]
-REAL_GIRO = ["exp2_real_giro90"]
+REAL_GIRO = ["exp2_real_giro90_r1", "exp2_real_giro90_r2", "exp2_real_giro90_r3"]   # serie oficial de E5 (el docente evalua el promedio de las 3)
 REAL_RECTA = ["exp1d_real_run1", "exp1d_real_run2", "exp1d_real_run3"]
 REAL_CUAD = ["exp3a_real", "exp3b_real_run1", "exp3b_real_run2", "exp3b_real_run3"]
 REAL_CSV = REAL_GIRO + REAL_RECTA + REAL_CUAD
@@ -166,7 +166,7 @@ def evaluar(raiz):
                    "cumple " + "/".join(cumple) if cumple else "sin dato o no cumple"))
 
     # ---- E5: robot real, arranque y giro de 90 grados
-    it.append(Item("E5", "CSV del giro90 real (csv/exp2_real_giro90.csv)", contar(raiz, [f"csv/{s}.csv" for s in REAL_GIRO]), 1))
+    it.append(Item("E5", "CSV del giro90 real, serie oficial (csv/exp2_real_giro90_r1..r3.csv)", contar(raiz, [f"csv/{s}.csv" for s in REAL_GIRO]), len(REAL_GIRO)))
     fg = filas(hoja, "2", "real")
     it.append(Item("E5", "fila de la hoja (prueba 2, planta real)", int(bool(fg)), 1))
     eg = kv(fg[-1].get("notas")).get("e_fin_deg") if fg else None   # la ultima fila es la vigente (las anteriores son configuraciones previas)

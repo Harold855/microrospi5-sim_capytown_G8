@@ -46,7 +46,7 @@ Antes de encender nada leer el Anexo C del reto. Primera prueba con las ruedas e
 
 | Orden | Prueba | Parámetros | CSV | Bag |
 |---|---|---|---|---|
-| 1 | giro90 (E5) | ganancias del simulador, `linear_speed:=0.10 max_angular:=1.0` | `csv/exp2_real_giro90.csv` | – |
+| 1 | giro90 (E5) | ganancias del simulador, `linear_speed:=0.10 max_angular:=1.0` | `csv/exp2_real_giro90_r1..r3.csv` (E5 se evalúa con el promedio de las 3, respuesta del docente) | – |
 | 2 | recta 1D ×3 (E6) | `experimento:=recta line_offset:=0.10`, **sin** `bias_w` | `csv/exp1d_real_run1..3.csv` | – |
 | 3 | 3A ×1 (E7) | `experimento:=cuadrado_abierto` | `csv/exp3a_real.csv` | `bags/rc1_real_3a` |
 | 4 | 3B ×3 (E7) | `experimento:=cuadrado` | `csv/exp3b_real_run1..3.csv` | `bags/rc1_real_3b_run1..3` |
