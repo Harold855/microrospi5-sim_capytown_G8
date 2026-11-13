@@ -45,3 +45,15 @@ Resumen de `/odom` en las 10 corridas con `kp_yaw` 1.0 (incluye la C): 88.1° a 
 - Falta una medida física fiable. Método propuesto: líneas de rumbo largas (≥ 40 cm) con regla, a ≥ 25 cm del centro del robot (fuera del círculo de las ruedas), ángulo medido en el cruce de las líneas por dos personas; o foto cenital. CSV de cada corrida con nombre distinto (`cal$N`).
 - Con la media y la dispersión de ≥ 5 corridas se decide: calibrar `wheel_separation` con `b_nuevo = b_actual × θ_odom / θ_real` (si la dispersión es ≤ 3°), o buscar otra causa (patinaje no repetible).
 - Predicciones nuevas para `kp_yaw` 1.0, antes de la corrida oficial de E5.
+
+## 13-nov-2026 — serie con transportador circular (`kp_yaw` 1.0, mismas ganancias)
+Tres corridas hechas **después** de subir las predicciones de `predicciones_E5_kp1.md` (commit `f9c8336`). Método: transportador circular con el robot colocado en el centro de un cuadrante del piso, ángulo leído al detenerse. Las tres escribieron en el mismo `csv/exp2_real_giro90_cal2.csv` (no se cambió `N`), así que solo se conserva el CSV de la tercera.
+
+| Corrida | Yaw `/odom` (°) | Tiempo (s) | Error de cierre (cm) | Ángulo físico medido (°) | Error físico (°) |
+|---|---|---|---|---|---|
+| 1 | 88.5 | 6.1 | 0.4 | 85 | 5 |
+| 2 | 89.2 | 5.8 | 0.2 | 90 | 0 |
+| 3 | 88.5 | 6.3 | 0.2 | 87 | 3 |
+
+Resumen: físico medio 87.3°, desviación estándar muestral ≈ 2.5° (error estándar de la media ≈ 1.5°). Cociente θ_odom/θ_real por corrida: 1.041, 0.991, 1.017 (media 1.016). Con esa dispersión la diferencia de la media respecto de 90° (≈ 2.7°) no es estadísticamente distinguible de cero con 3 corridas, y recalcular `wheel_separation` movería el valor solo ≈ 1.6 % (0.2138 → ≈ 0.217). Observación del grupo: el robot «se acomodó» solo hasta ajustarse a ≈ 90°.
+Pendiente: decidir con el docente si E5 se evalúa por una corrida o por el promedio, y registrar las corridas oficiales con un CSV distinto por corrida.
