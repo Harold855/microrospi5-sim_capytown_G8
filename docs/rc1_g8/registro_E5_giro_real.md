@@ -102,3 +102,8 @@ Respuesta del docente (transcrita por el grupo):
 - En la **sustentación en vivo** se hace **una sola corrida de cada parte (E5 a E7)**, más el **BONUS**, por el tiempo y el número de grupos. Esas corridas en vivo cuentan como calificación de sustentación, que se complementa con la sustentación del código.
 
 Corridas de E5 con transportador (todas siguen registradas): 85°, 90°, 87° (serie 1) y 83° (mal posicionado), 93°, 91° (serie oficial) y 88° (corrida adicional con video). Con el criterio de una prueba suficiente, la evidencia de E5 debe citar **una** corrida concreta y, a la vez, listar todas las demás sin ocultar las que quedaron fuera de ±3°.
+
+## 13-nov-2026 — corrida que acredita E5
+Criterio del docente: una prueba basta. El grupo designa la corrida **r3** (ángulo físico 91°, error 1°, `FIN` a 5.60 s) como evidencia de E5; `csv/exp2_real_giro90.csv` es una copia de `exp2_real_giro90_r3.csv`.
+Transparencia: r3 **fue elegida entre las corridas medidas con transportador**, no fue la primera ni se fijó antes. Orden cronológico: serie previa (85°, 90°, 87°) → serie oficial (83° mal posicionado, 93°, **91° = r3**) → corrida adicional con video (88°). Siete medidas: media 88.1°, desviación ≈ 3.5°; dos quedaron fuera de ±3° (85° y 83°). La probabilidad de que una corrida cualquiera cumpla es ≈ 70 %, y eso es lo que importa para la corrida en vivo.
+Nota: el video corresponde a la corrida adicional (88°), no a r3.
