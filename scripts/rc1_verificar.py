@@ -31,7 +31,7 @@ SIM_RECTA = ["exp1a_sim", "exp1b_sim", "exp1c_sim", "exp1d_sim"]
 SIM_GIRO = ["exp2a_sim", "exp2b_sim", "exp2c_sim", "exp2p_sim"]
 SIM_CUAD = [f"exp3{l}_sim_{r}" for l in "abc" for r in RUNS]
 SIM_CINTA = [f"exp3{l}_sim_cinta_{r}" for l in "abc" for r in RUNS]
-REAL_GIRO = ["exp2_real_giro90_r1", "exp2_real_giro90_r2", "exp2_real_giro90_r3"]   # serie oficial de E5 (el docente evalua el promedio de las 3)
+REAL_GIRO = ["exp2_real_giro90_r1", "exp2_real_giro90_r2", "exp2_real_giro90_r3"]   # serie oficial de E5 (el docente acepta una prueba; E5 se acredita con la corrida r3)
 REAL_RECTA = ["exp1d_real_run1", "exp1d_real_run2", "exp1d_real_run3"]
 REAL_CUAD = ["exp3a_real", "exp3b_real_run1", "exp3b_real_run2", "exp3b_real_run3"]
 REAL_CSV = REAL_GIRO + REAL_RECTA + REAL_CUAD
@@ -100,6 +100,12 @@ def filas(hoja, prueba, planta, noise=None):
     if noise:
         out = [f for f in out if (f.get("noise") or "").strip().lower() == noise]
     return out
+
+
+def oficiales(filas_):
+    """Filas oficiales (etiqueta run1/run2/run3 en la primera palabra de `notas`). Si no hay ninguna etiquetada, usa todas."""
+    of = [f for f in filas_ if (f.get("notas") or "").split(";")[0].strip() in ("run1", "run2", "run3")]
+    return of or filas_
 
 
 def pendiente(path):
@@ -175,21 +181,22 @@ def evaluar(raiz):
 
     # ---- E6: robot real, recta (1D), 3 corridas
     it.append(Item("E6", "CSV de las 3 rectas reales", contar(raiz, [f"csv/{s}.csv" for s in REAL_RECTA]), 3))
-    f1r = filas(hoja, "1D", "real")
-    it.append(Item("E6", "filas de la hoja (1D real, 3 corridas)", min(3, len(f1r)), 3))
+    f1r = oficiales(filas(hoja, "1D", "real"))
+    it.append(Item("E6", "filas de la hoja (1D real, 3 corridas oficiales)", min(3, len(f1r)), 3))
     desv = [kv(f.get("notas")).get("desvio_cm") for f in f1r]
     desv = [d for d in desv if d is not None]
-    it.append(Item("E6", "regla: desvio lateral final con cinta <= 5 cm en las 3 corridas (notas: desvio_cm=; la catedra puede ajustar)",
-                   int(len(desv) >= 3 and max(desv) <= 5.0), 1,
-                   "sin 3 datos" if len(desv) < 3 else f"max={max(desv)} cm"))
+    it.append(Item("E6", "regla: desvio lateral final con cinta <= 5 cm en AL MENOS UNA de las 3 corridas oficiales (docente; notas: desvio_cm=)",
+                   int(len(desv) >= 3 and min(desv) <= 5.0), 1,
+                   "sin 3 datos" if len(desv) < 3 else f"desvios={desv} cm (min={min(desv)})"))
 
     # ---- E7: robot real, cuadrado de 2 x 2 m (3A una vez, 3B tres veces)
     it.append(Item("E7", "CSV del cuadrado real (3A x1, 3B x3)", contar(raiz, [f"csv/{s}.csv" for s in REAL_CUAD]), 4))
     it.append(Item("E7", "bags ROS 2 (carpeta con metadata.yaml)",
                    sum(1 for b_ in REAL_BAGS if os.path.isfile(ruta(raiz, "bags", b_, "metadata.yaml"))), 4))
-    n_real = min(1, len(filas(hoja, "3A", "real"))) + min(3, len(filas(hoja, "3B", "real")))
+    f3b = oficiales(filas(hoja, "3B", "real"))
+    n_real = min(1, len(filas(hoja, "3A", "real"))) + min(3, len(f3b))
     it.append(Item("E7", "filas de la hoja con planta=real (3A x1, 3B x3)", n_real, 4))
-    r3b = [num(f.get("cierre_real_cm")) for f in filas(hoja, "3B", "real")]
+    r3b = [num(f.get("cierre_real_cm")) for f in f3b]
     r3b = [v for v in r3b if v is not None]
     media = sum(r3b) / len(r3b) if len(r3b) >= 3 else None
     r3a = [num(f.get("cierre_real_cm")) for f in filas(hoja, "3A", "real")]
