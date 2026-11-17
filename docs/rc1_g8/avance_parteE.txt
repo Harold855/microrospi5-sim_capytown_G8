@@ -1,0 +1,161 @@
+RC-1 · GRUPO 8 — AVANCE DE LA PARTE E (ROBOT REAL: GIRO DE 90°, RECTA Y CUADRADO)
+Fecha: 12 a 17-nov-2026 (hora de Perú; sesiones de laboratorio el 12 y el 13-nov)
+
+ESTADO: E5 (GIRO DE 90° REAL) TERMINADO Y ACREDITADO. E6 (RECTA) Y E7 (CUADRADO) PREPARADOS, SIN CORRIDAS TODAVÍA.
+Sigue la próxima sesión corta de laboratorio: E6 y E7.
+
+----------------------------------------------------------------------
+1. QUÉ SE HIZO
+----------------------------------------------------------------------
+Puesta en marcha del RosCar 4 (Raspberry Pi 5, contenedor ros2_dev, ROS_DOMAIN_ID=8):
+- Se encendió el robot, se entró por SSH y se lanzó el bringup (capytown_esan). Se comprobó que /odom llega (≈ 11.1 Hz, casi 5 veces
+  más lento que el simulador) y que no hay EKF.
+- El Pi no tiene reloj con batería: cada sesión hay que poner la hora a mano.
+- El robot venía con la calibración de ruedas de otro espacio de trabajo (r = 0.0316, b_eff = 0.2332). Se cargó la calibración
+  propia del grupo (r = 0.03145, b_eff = 0.2138) con un archivo aparte (wheel_params_g8.yaml) y se comprobó en el log de arranque.
+- Se llevó al contenedor el nodo del curso (scripts_pdi, que no va en git) y se comprobó con el hash que es el original.
+
+E5 — giro de 90° en sitio con las ganancias del simulador (meta de la rúbrica: error final ≤ 3° medido con transportador):
+- Primero con las ruedas en el aire, y después en el suelo, con las ganancias que mejor funcionaron en el simulador (Kp 10, Kd 0.6).
+- Resultado: el giro real NO se asienta. Oscila de un lado a otro (±15–20°, un ciclo cada ≈ 2.6 s).
+- Se hizo la re-sintonía #1 (de 3 permitidas): Kp del giro de 10 a 1.0, con todo lo demás igual.
+- Con Kp 1.0 el robot sí termina (FIN en 5.0–8.7 s). Se hicieron 10 corridas exploratorias y luego una serie oficial de 3, más una corrida
+  adicional grabada en video. Cada ángulo físico se midió con transportador.
+- Se escribieron las predicciones dos veces: para Kp 10 (antes de correr) y para Kp 1.0 (después de las exploratorias; el documento lo dice).
+
+Reglas que fijó el docente (confirmadas por escrito en el chat del grupo):
+- E5: con una prueba basta.
+- E6: tres corridas; basta que al menos una tenga desvío lateral final menor de 5 cm.
+- E7: 3A una corrida y 3B tres; media de 3B ≤ 25 cm y menor que 3A.
+- En la sustentación en vivo: una sola corrida de cada parte (E5 a E7) más el BONUS (3B ≤ 10 cm con 3A para comparar).
+
+Preparación de E6 y E7 (sin robot):
+- E6: predicciones de la corrida experimental 1 subidas antes de correr, y un archivo de razonamiento con un modelo de la recta con retardo.
+- E7: predicciones de 3A subidas; las de 3B y del bonus están en borrador (esperan los resultados de E6 y de las corridas del repositorio);
+  archivo de razonamiento con una simulación de lo que pasa con los errores de ángulo en las esquinas.
+- Herramientas nuevas: rc1_correr.sh (lanza cada corrida con comprobaciones, bag, CSV y orden de parada), rc1_anotar_real.py (anota en la hoja),
+  rc1_analiza_real.py (analiza los CSV) y un verificador de avance adaptado a las reglas del docente.
+- Documento de funcionamiento (qué hace cada código y quién mueve y quién para al robot) e informe de 1 página con E5.
+
+----------------------------------------------------------------------
+2. QUÉ SE OBTUVO (VALORES IMPORTANTES)
+----------------------------------------------------------------------
+a) El giro con Kp 10 no sirve en el robot real:
+   - Con las ruedas en el aire: primer pico a 105° (pasa 15° de 90°), 106 cambios de signo del error en 93 s, solo el 7 % del tiempo dentro de ±2°.
+   - En el suelo: primer pico a 109.9° (pasa 19.9°, un 22 %), oscilación sostenida, solo el 4 % del tiempo dentro de ±2°.
+   - Causa: el robot real tarda en responder (≈ 0.5–0.65 s, estimado del período de la oscilación) y /odom llega a ≈ 11 Hz. Con Kp 10 el
+     controlador se pasa de largo una y otra vez.
+
+b) El giro con Kp 1.0 sí termina:
+   - FIN entre 5.0 y 8.7 s (el simulador, 1.01 s). No hay sobreimpulso: el nodo se detiene a 88–89° según /odom, dentro de su tolerancia de ±2°.
+
+c) Siete medidas con transportador del ángulo físico (meta: 87° a 93°):
+     85°, 90°, 87°      (serie previa)
+     83°, 93°, 91°      (serie oficial; la de 83° se anotó «mal posicionado» y no se descarta)
+     88°                (corrida adicional con video)
+   Media 88.1°, desviación ≈ 3.5°. Cinco de siete dentro de ±3° (fallan 85° y 83°).
+
+d) E5 SE ACREDITA con la corrida r3 (91°, error 1°). El docente aceptó una sola prueba. Las otras corridas siguen documentadas, incluidas las
+   dos que quedaron fuera de ±3°, y el registro dice que r3 se eligió entre varias, no fue la primera.
+
+e) Predicciones contra lo medido en E5 (con Kp 1.0):
+   - Asentamiento ≈ 6 s: FIN 5.0–8.7 s. Se cumplió.
+   - Sobreimpulso ≈ 1°: no hubo (pico de /odom de 88–89°). No se cumplió.
+   - Ángulo físico entre 75° y 95°: salió entre 83° y 93°. Se cumplió.
+   - Sin oscilación sostenida y con pocas inversiones de w al final: lo primero sí; el criterio de «como máximo 2 inversiones» no (hubo 5, 5, 16 y 19).
+     Son órdenes pequeñas (|w| ≲ 0.25 rad/s) por la derivada con un /odom que cambia cada ≈ 0.09 s, no una oscilación visible.
+
+f) Sobre /odom y la calibración:
+   - Con la calibración propia (r 0.03145, b_eff 0.2138) no se vio un sesgo sistemático entre /odom y el ángulo físico (cociente ≈ 0.99).
+   - Con los valores que traía el robot se calculó un error físico de ≈ 8° en un giro de 90° (cálculo, no medida).
+   - La dispersión de ≈ ±3.5° es patinaje del piso y medición, y es lo que limitará el cierre del cuadrado: 1° de error en cada esquina ≈ 10 cm.
+
+g) Datos para predecir E7 (de un modelo con los errores de E5, esquinas independientes y rectas sin error):
+   - 3B: cierre mediano ≈ 24 cm; probabilidad de que la media de tres sea ≤ 25 cm ≈ 46 %; de quedar ≤ 10 cm en una corrida ≈ 12 %.
+   - 3A: con el hallazgo de que el robot gira ≈ 7–11 % más que lo ordenado (medido con w = 1.0), el giro por tiempo da ≈ 98° por esquina y un
+     cierre de ≈ 75 cm. Es una hipótesis que solo la corrida confirma.
+
+----------------------------------------------------------------------
+3. QUÉ HAY EN EL REPOSITORIO
+----------------------------------------------------------------------
+Rama claude/sleepy-knuth-kc6wex del repositorio microrospi5-sim_capytown_G8:
+  - csv/exp2_real_giro90_{aire,run1,run2,cal1,r1,r2,r3,extra}.csv  y  csv/exp2_real_giro90.csv (copia de r3, la corrida que acredita E5)
+  - plots/exp2_real_giro90_{r1,r2,r3,extra}.png                    (gráficas)
+  - hoja_resultados.csv  (filas 2 real con predicciones, resultados y notas)
+  - config/rc1_pid.yaml  (bloque robot_real con kp_yaw 1.0) y wheel_params_g8.yaml (calibración propia)
+  - docs/rc1_g8/predicciones_E5.md, predicciones_E5_kp1.md, predicciones_E6_exp1.md, predicciones_E7_3A.md
+  - docs/rc1_g8/registro_E5_giro_real.md  (todas las corridas, el criterio del docente y la corrida que acredita E5)
+  - docs/rc1_g8/razonamiento_E6.txt, razonamiento_E7.txt, laboratorio_E_F.md (plantilla de las Partes E y F)
+  - docs/rc1_g8/funcionamiento_rc1.md y .docx  (cómo funciona cada código, quién mueve y quién para)
+  - scripts/rc1_correr.sh, rc1_anotar_real.py, rc1_analiza_real.py, rc1_verificar.py, rc1_md_a_docx.py
+  - informe.md e informe.pdf  (1 página, con E5; E6 y E7 en blanco)
+No se sube: scripts_pdi/ (material del docente) ni los borradores de predicciones de 3B y del bonus (esperan E6 y las corridas del repositorio).
+
+----------------------------------------------------------------------
+4. CÓMO REPRODUCIR LA PARTE E
+----------------------------------------------------------------------
+Hacen falta: el robot cargado (batería ≥ 70), una PC con el clon del repositorio, 2 m de recta y 2 × 2 m de suelo libre (más margen), cinta métrica,
+transportador, cinta adhesiva, y una persona con la mano en el interruptor.
+
+Paso 1 - HORA DEL PI (cada sesión; el Pi no guarda la hora). En el host del Pi:
+      sudo timedatectl set-time "AAAA-MM-DD HH:MM:SS"      (hora de Lima)
+      date -Is ; docker exec ros2_dev date -Is              (los dos deben coincidir; el del contenedor sale en UTC)
+
+Paso 2 - BRINGUP con la calibración propia (Terminal 1, déjala abierta; si se cierra, se apaga):
+      docker exec -it ros2_dev bash
+      source /opt/ros/humble/setup.bash ; source /root/yahboomcar_ws/install/setup.bash ; export ROS_DOMAIN_ID=8
+      ros2 launch capytown_esan bringup.launch.py wheel_params:=/root/wheel_params_g8.yaml
+  En el log debe decir b_eff=0.2138 y k_ang=1.0863.
+
+Paso 3 - LLEVAR LAS HERRAMIENTAS AL CONTENEDOR (el repo del Pi es viejo): desde la PC, scp -r del clon al Pi y docker cp al contenedor
+  (scripts_pdi/ debe ir dentro de la carpeta; no viene en git). Comprobar:
+      docker exec ros2_dev sha256sum /root/microrospi5-sim_capytown_G8/scripts_pdi/cuadrado_controller.py   ->  empieza por d618e71722c4153d
+
+Paso 4 - ANTES DE CADA CORRIDA (Terminal 2, contenedor, desde la raíz del repo): scripts/rc1_correr.sh hace las comprobaciones (hash, un solo
+  /odom_corrector, un solo publicador de /odom, batería, que el CSV no exista) y pide confirmar.
+
+Paso 5 - LAS CORRIDAS (cada una es un comando; el nombre cambia cada vez):
+      scripts/rc1_correr.sh giro run1           E5: giro de 90°   (csv/exp2_real_giro90_run1.csv)
+      scripts/rc1_correr.sh recta run1          E6: recta         (csv/exp1d_real_run1.csv; experimentales con exp1, exp2...)
+      scripts/rc1_correr.sh 3a -                E7: 3A una vez    (csv/exp3a_real.csv, bag rc1_real_3a)
+      scripts/rc1_correr.sh 3b run1             E7: 3B            (csv/exp3b_real_run1.csv, bag rc1_real_3b_run1)
+  El script siempre publica ceros en /cmd_vel al terminar o al cortar, y propone el comando para anotar en la hoja.
+  Para una variante: scripts/rc1_correr.sh recta run2 ki=0.1  (un parámetro por prueba).
+
+Paso 6 - MEDIR (dos personas): giro con transportador (centro del robot en el centro del transportador, ángulo entre la línea inicial y la final);
+  recta con cinta, la distancia perpendicular del centro del robot a la línea; cuadrado con cinta, de la marca de inicio al centro del robot,
+  y el ángulo final con transportador.
+
+Paso 7 - TRAER LOS CSV AL CLON (nunca hacer commit desde el Pi): en el host del Pi, borrar ~/csv_lab si existe y docker cp ros2_dev:/root/.../csv ~/csv_lab;
+  desde PowerShell, scp pi@10.42.0.1:~/csv_lab/<archivo> .\csv\ ; luego, en el clon:
+      python3 scripts/rc1_analiza_real.py csv/<archivo> --criterios e6 --png        (métricas del CSV y gráfica)
+      python3 scripts/rc1_anotar_real.py 1D run1 ki=0.5 desvio_cm=<cinta> ...        (anota la corrida en la hoja)
+      git add . ; git commit ; git pull --rebase --autostash origin claude/sleepy-knuth-kc6wex ; git -c credential.helper= push origin claude/sleepy-knuth-kc6wex
+  (PowerShell de la PC del laboratorio: si git se queda en silencio, usar git -c http.sslBackend=openssl ...)
+
+Errores que ya ocurrieron y precauciones (para no repetirlos):
+  - Cortar el nodo antes de FIN (Ctrl+C o timeout): el nodo no logra publicar la orden de parada y el robot real conserva la última orden y sigue
+    girando (pasó el 12-nov). Siempre ceros a continuación y persona en el interruptor.
+  - Modificar el nodo del curso dentro del contenedor (se restauró desde la copia original y se verificó el hash).
+  - Dos /odom_corrector a la vez (un bringup congelado siguió publicando y se lanzó otro): comprobar con ros2 node list y un solo publicador.
+  - Reloj del Pi mal (julio de 2026): los CSV y bags llevan esa hora; comprobar al empezar cada sesión.
+  - Olvidar cambiar la variable N: las corridas se sobrescriben en el mismo CSV. Con rc1_correr.sh cada corrida lleva su nombre explícito y no
+    deja sobrescribir.
+  - Cinta adhesiva dentro del círculo de las ruedas: el robot se atasca al girar. Las marcas de rumbo van fuera de ese círculo, a ≥ 25 cm del centro.
+  - Medir el ángulo con el transportador sobre el robot, sin extender las líneas: la dispersión de 75° a 95° era del método. Con las líneas
+    cruzadas y el transportador circular bajó a ≈ ±3.5°.
+  - Batería agotada: se apagó el Pi, se perdió la hora y el bringup. Comprobar /battery antes de cada sesión.
+  - (Precaución) Los commits se hacen desde el clon de la PC, no desde el Pi; las predicciones se suben antes de correr y no se modifican.
+
+----------------------------------------------------------------------
+5. LO QUE SIGUE
+----------------------------------------------------------------------
+E6 (recta real, 3 corridas; basta una con desvío lateral < 5 cm):
+  - Experimental 1 con las ganancias del simulador (Kp 3, Ki 0.5, Kd 4, línea a 10 cm, sin bias_w), predicciones ya subidas (commit 10c9a56,
+    13-nov 15:03 Lima). Se espera que oscile (hasta ±20 cm) por el retardo; si oscila, la re-sintonía candidata es bajar Ki (queda un máximo de 2).
+  - Después, las tres corridas oficiales con las predicciones nuevas escritas antes de correr.
+E7 (cuadrado real): 3A una vez (turn_scale 1.0; predicciones subidas, commit 39c65f9, 16-nov 00:20 Lima) y 3B tres veces con las ganancias de la
+  línea que salgan de E6; las predicciones de 3B y del bonus se cierran después de E6.
+BONUS y sustentación en vivo: una sola corrida de cada parte. Con la dispersión actual, la probabilidad de 3B ≤ 10 cm es baja (≈ 12 %).
+Después: informe de 1 página con E6 y E7, tabla de transferencia con datos del robot, README con la tabla de integrantes y las ganancias finales,
+ganancias finales en config/rc1_pid.yaml y la etiqueta v1.0-rc1.
