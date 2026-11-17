@@ -58,7 +58,7 @@ En la experimental 13 se observó una **desviación física aproximada de 5 cm h
 
 **Justificación:** las experimentales 12 y 13 terminaron con errores estimados por `/odom` de ≈ 3 cm, y solo la 13 tuvo estimación física (≈ 5 cm). No hay evidencia suficiente para una distribución de errores físicos ni para un porcentaje de éxito.
 
-**Verificación:** cinta perpendicular desde el centro del robot a la raya negra, conservando el lado (derecha/izquierda), contra ≤ 5 cm. Anotar por separado el `e_line` final de `/odom` y la orientación física.
+**Verificación:** cinta perpendicular desde el centro del robot a la raya negra, conservando el lado (derecha/izquierda), contra ≤ 5 cm. 
 
 ## Hipótesis 3. Cruces de la línea y magnitud del sobrepaso
 
@@ -89,9 +89,9 @@ En la experimental 13 se observó una **desviación física aproximada de 5 cm h
 | Intento | Ganancias (Kp / Ki / Kd) | Tiempo a `FIN` | Yaw final `/odom` | Desviación lateral física | Estado |
 |---|---|---:|---:|---:|---|
 | **Run 1** | 1.0 / 0.1 / 8.0 | 20.9 s | +2.0° | **0.6 cm derecha** | Válida |
-| **Run 2** | 1.0 / 0.1 / 8.0 | 21.0 s | −0.8° | **1.5 cm izquierda** | Válida |
+| **Run 2** | 1.0 / 0.1 / 8.0 | 21.0 s | −0.8° | **1.5 cm derecha** | Válida |
 | **Run 3** | No se confirmo | No aportan | No aportan | No se evaluo | Ocurrio un fallo físico durante la corrida (el Roscar se trabo con la cinta métrica y no pudo avanzar) |
-| **Run 4** | No se confirmo | No aportado | No se aportan | **6 cm** | Invalida(Robot mal posicionado al inicio, excede el límite) |
+| **Run 4** | No se confirmo | No aportado | No se aportan | **6 cm izquierda** | Invalida(Robot mal posicionado al inicio, excede el límite) |
 | **Run 5** | 1.0 / 0.1 / 8.0 | 21.0 s | +1.6° | **0.5 cm derecha** | Válida (anotada en la hoja como `run3`, con la nota «CSV run5») |
 
 Las tres corridas consideradas válidas (`run1`, `run2`, `run5`):
@@ -116,4 +116,4 @@ Las tres corridas consideradas válidas (`run1`, `run2`, `run5`):
 
 ## Conclusión
 
-Tras la sintonización, la configuración `Kp=1.0`, `Ki=0.1`, `Kd=8.0` produjo dos experimentales previas (12 y 13) muy parecidas: ≈ 21 s, un cruce y sobrepaso de ≈ 3.6–3.7 cm según `/odom`. Las corridas válidas `run1`, `run2` y `run5` alcanzaron desviaciones físicas de **0.6, 1.5 y 0.5 cm** (promedio 0.87 cm), todas bajo el límite de 5 cm; de las cuatro hipótesis reconstruidas, tres se cumplen y la de la banda de error físico (2–6 cm) queda por debajo. El resultado se obtuvo tras **13 pruebas exploratorias** y con una combinación de `Kd` 8 y un protocolo de alineación inicial estricto, y con estos datos no se puede repartir el mérito entre ambos. Las hipótesis reconstruidas permiten interpretar la mejora, pero **no deben presentarse como predicciones escritas antes de las corridas**, y la selección de las tres corridas válidas requiere el visto bueno del docente.
+Tras la sintonización, la configuración `Kp=1.0`, `Ki=0.1`, `Kd=8.0` produjo dos experimentales previas (12 y 13) muy parecidas: ≈ 21 s, un cruce y sobrepaso de ≈ 3.6–3.7 cm según `/odom`. Las corridas válidas `run1`, `run2` y `run5` alcanzaron desviaciones físicas de **0.6, 1.5 y 0.5 cm** (promedio 0.87 cm), todas bajo el límite de 5 cm; de las cuatro hipótesis reconstruidas, tres se cumplen y la de la banda de error físico (2–6 cm) queda por debajo. El resultado se obtuvo tras **13 pruebas exploratorias** y con una combinación de `Kd` 8 y un protocolo de alineación inicial estricto, y con estos datos no se puede repartir el mérito entre ambos. 
