@@ -1,0 +1,152 @@
+RC-1 · GRUPO 8 — RAZONAMIENTO PARA PREDECIR E7 (CUADRADO REAL DE 2 x 2 m: 3A Y 3B) Y EL BONUS
+Fecha: 15-nov-2026
+
+Este archivo NO contiene las predicciones del grupo. Son material para razonarlas: un modelo simple, sus resultados y lo que
+implican. Las predicciones las escribe el grupo y se suben a git ANTES de correr cada prueba.
+
+----------------------------------------------------------------------
+1. QUÉ PIDE E7 Y EL BONUS
+----------------------------------------------------------------------
+- Documento oficial (E7, 4 pt): «Robot real, cuadrado de 2 x 2 m: 3A una vez y 3B tres veces, con cinta y bags; cierre medido promedio
+  de 3B <= 25 cm y menor que el de 3A. [Cátedra: ajustar tras el primer turno.]»
+- Aclaración del docente: en el repositorio, A se hace 1 vez y B 3 veces. En la sustentación en vivo, 1 sola corrida de cada parte (E5 a E7)
+  más el BONUS.
+- Bonus (+2): demostración frente al docente, sin recalibrar: 3B con cierre <= 10 cm, más 3A para comparar.
+- Qué se mide: el cierre REAL con cinta métrica, de la marca de inicio al centro del robot, y el ángulo final con transportador.
+  El cierre que imprime el nodo sale de /odom y NO es el que cuenta.
+- Experimentos: 3A = cuadrado_abierto (lazo abierto: avanza y gira por tiempo); 3B = cuadrado (PID de la línea y del giro sobre /odom).
+- Reglas del nodo para el robot real: nodo original, SIN bias_w, linear_speed 0.10 m/s, max_angular 1.0, kp_yaw 1.0 y kd_yaw 0.6
+  (re-sintonía #1 de la Parte E, ya hecha). Las ganancias de la línea (kp, ki, kd) de 3B serán las que queden tras E6.
+
+----------------------------------------------------------------------
+2. QUÉ SE SABE DEL SIMULADOR Y POR QUÉ NO SE TRANSFIERE TAL CUAL
+----------------------------------------------------------------------
+Cierre REAL medio en el simulador, noise:=low (3 corridas por prueba): 3A 16.1 cm, 3B 58.7 cm, 3C 30.1 cm. Según /odom, 3B y 3C cerraban
+a < 1 cm. En el simulador el lazo abierto (3A) cerró mejor porque no depende de /odom y no hay derrape de ruedas.
+En el robot real se espera lo contrario (E7 exige 3B < 3A), porque:
+  - El lazo abierto se apoya en que el giro por tiempo sea de 90°; el derrape y la calibración de las 4 ruedas lo cambian.
+  - 3B cierra el lazo sobre /odom, ya calibrado con r y b_eff propios.
+Pero el simulador sí enseña una cosa: el cierre real lo dominan los errores de ángulo en las esquinas, no la distancia recorrida.
+
+----------------------------------------------------------------------
+3. LA REGLA QUE ORDENA TODO: UN GRADO POR ESQUINA ≈ 10 cm
+----------------------------------------------------------------------
+Es su predicción 3 de las generales: con lados de 2 m y un error constante en cada giro, el cierre es (calculado):
+   1 grado por esquina  ->  9.8 cm
+   2 grados             -> 19.4 cm
+   5 grados             -> 47.1 cm
+  10 grados             -> 89.3 cm
+Los errores de las esquinas se suman a los rumbos de los lados siguientes: el cierre es |suma de los 4 vectores de 2 m|, con rumbos
+0, 90+e1, 180+e1+e2, 270+e1+e2+e3. El cuarto giro no cambia la posición final.
+
+----------------------------------------------------------------------
+4. REFERENCIA PARA 3B (PID sobre /odom) A PARTIR DE LOS DATOS DE E5
+----------------------------------------------------------------------
+En E5 (giro real con kp_yaw 1.0), siete medidas con transportador dieron errores respecto de 90° de -5, 0, -3, -7, +3, +1 y -2 grados:
+media -1.8°, desviación ≈ 3.5°. Si cada esquina de 3B se comportara así (esquinas independientes), una simulación de 200 000 cuadrados da:
+
+  Escenario de error por esquina    Cierre mediano   P(una corrida <= 25 cm)   P(media de 3 <= 25 cm)   P(<= 10 cm, bonus)
+  Medido en E5: -1.8° ± 3.5°            ≈ 24 cm              52 %                     46 %                    12 %
+  Sin desvío medio: 0° ± 3.5°           ≈ 19 cm              67 %                     73 %                    17 %
+  Desviación 2°: -1.8° ± 2.0°           ≈ 19 cm              68 %                     78 %                    18 %
+  Solo 0° ± 2.0°                        ≈ 11 cm              95 %                    ≈100 %                   43 %
+  Solo 0° ± 1.0°                        ≈ 6 cm              100 %                    100 %                    87 %
+
+LÍMITES (no lo traten como un hecho):
+  - Supone esquinas independientes y que las rectas no añaden error. En las rectas hay deriva lateral y el PID corrige sobre /odom,
+    no sobre la realidad.
+  - Los errores de E5 se midieron girando en sitio sin recorrer 2 m antes; en el cuadrado el estado de las ruedas y el piso cambian.
+  - Una muestra de 7 giros es pequeña; media y desviación tienen incertidumbre.
+
+QUÉ SUGIERE [Probable]:
+  - Con la precisión del giro de E5, cumplir la media de 3B <= 25 cm es casi una moneda al aire.
+  - La mejora viene de quitar el desvío medio (el robot termina 1-2° corto: el nodo se detiene dentro de ±2° de la tolerancia) y de bajar
+    la dispersión. El documento da, para «el giro queda 1-2° corto», la acción «ki_yaw pequeño». Sería una re-sintonía (queda máximo 2
+    de las 3 de la Parte E), con su predicción escrita antes y una corrida de ensayo.
+  - Las ganancias de la línea de 3B vienen de E6; si la recta oscila, el cuadrado también lo sentirá.
+  - El bonus (<= 10 cm) solo es realista si la dispersión de los giros baja a ≈ 1-2°; con los datos actuales es poco probable (≈ 12-18 %).
+
+----------------------------------------------------------------------
+5. REFERENCIA PARA 3A (LAZO ABIERTO)
+----------------------------------------------------------------------
+3A avanza side/v = 2.0/0.10 = 20 s por lado y gira un tiempo fijo (pi/2)/(turn_w · turn_scale) = (1.5708)/(0.8 · 1.0) ≈ 1.96 s, sin
+ningún sensor. El ángulo físico de cada giro depende de cómo traduzca el robot ω = 0.8 rad/s en giro real, y eso NO se ha medido
+(en E5 el controlador paraba cuando /odom decía 90°, sin pasar por la relación orden -> giro).
+  - Si el giro real por tiempo es distinto de 90° en un error SISTEMÁTICO por esquina, el cierre crece muy rápido (misma regla de 10 cm/grado):
+
+  Error sistemático por esquina (dispersión 3.5°)   Cierre mediano    p25 - p75
+   0°                                                   19 cm          12 - 28 cm
+  -3°                                                   33 cm          21 - 47 cm
+  -5° / +5°                                             53 / 49 cm     38 - 68 / 36 - 62 cm
+  -10° / +10°                                          107 / 90 cm     91 - 123 / 78 - 102 cm
+
+  - [Especulando] La relación entre la orden del firmware y el giro real depende de los parámetros de fábrica de las ruedas (b0 = 0.24 m)
+    frente a los efectivos (b_eff = 0.2138 m tras la calibración): una diferencia del orden del 10 % ya son ≈ 9° por esquina. Solo la
+    medición en el robot lo confirma.
+  - Por tanto, lo más probable es que 3A salga bastante peor que 3B (cumple el «3B < 3A» de la rúbrica), pero el valor concreto es
+    muy incierto.
+
+DECISIÓN QUE DEBEN TOMAR ANTES DE LA SESIÓN: ¿3A con turn_scale 1.0 (como el documento) o calibrado?
+  - Con 1.0 queda documentado y es lo que pide la rúbrica; es previsible que cierre peor que 3B.
+  - Si se calibra turn_scale (1/χ), 3A podría quedar tan bien o mejor que 3B y se perdería la condición «3B menor que 3A». Si se hace,
+    es otra re-sintonía, con predicción propia, y debe quedar escrita de antemano.
+
+----------------------------------------------------------------------
+6. CÓMO USARLO PARA ESCRIBIR LAS PREDICCIONES
+----------------------------------------------------------------------
+Escriban rangos y probabilidades, con la razón. Preguntas orientativas (3A y 3B por separado; 3B tres corridas):
+  1. Cierre REAL esperado con cinta (cm): valor central y rango.
+  2. Cierre que imprimirá el nodo según /odom: ¿mucho menor que el real? ¿cuánto? (en el simulador era < 1 cm en 3B).
+  3. Yaw acumulado real (transportador): ¿cuánto se desvía de 360° y de qué lado?
+  4. ¿La media de las 3 corridas de 3B será <= 25 cm? ¿Y menor que 3A? Una probabilidad con razón.
+  5. ¿Qué parte del recorrido aportará más error: esquinas o rectas?
+  6. Bonus: ¿alcanzará 3B <= 10 cm? Probabilidad y razón.
+Criterios comprobables: el cierre y el yaw en cm y grados, el tiempo hasta FIN, y que w = 0.000 en FIN. Las de las corridas oficiales se escriben
+después de las experimentales, indicando que se redactaron después de ellas, como en E5 y E6.
+
+----------------------------------------------------------------------
+7. PLAN DE LA SESIÓN Y TIEMPOS
+----------------------------------------------------------------------
+Tiempo por corrida (aprox.): 3A ≈ 4 x 20 s + 4 x 2 s ≈ 88 s; 3B ≈ 4 x 20 s + 4 giros de ≈ 5-6 s ≈ 100-105 s. Con reposicionar y medir ≈ 3 min
+por corrida, las cuatro oficiales (3A una, 3B tres) caben en ≈ 20 min, más el montaje.
+
+Orden sugerido: 1) 3A una vez; 2) 3B experimental (opcional, solo si hay re-sintonía); 3) 3B oficiales run1, run2, run3.
+
+Marcas y medición:
+  - Cuadrado de 2 x 2 m más 15 cm de margen por lado. Cruz de inicio con rumbo, esquinas marcadas (referencia, fuera de la trayectoria de las ruedas).
+  - Robot contra un tope fijo en cada inicio.
+  - Al terminar, con el robot detenido: cierre = distancia de la marca de inicio al CENTRO del robot (cinta, dos personas); ángulo final con
+    transportador (el robot debería haber girado 360° en total: ojo con el rumbo final respecto del inicial).
+  - Dos fotos (inicio y final) por corrida.
+
+Bags y archivos (nombres que espera el verificador):
+  3A:  csv/exp3a_real.csv         bags/rc1_real_3a
+  3B:  csv/exp3b_real_run1..3.csv bags/rc1_real_3b_run1..3
+  Grabar el bag ANTES del nodo, en otra terminal, y pararlo después:
+    ros2 bag record /odom /cmd_vel /tf -o bags/rc1_real_3b_run1
+
+----------------------------------------------------------------------
+8. COMANDOS (una corrida; cambiar el nombre cada vez, siempre explícito)
+----------------------------------------------------------------------
+Verificar las banderas (solo imprime):
+  python3 scripts/rc1_args.py robot_real experimento=cuadrado_abierto log_csv=csv/exp3a_real.csv
+  python3 scripts/rc1_args.py robot_real experimento=cuadrado log_csv=csv/exp3b_real_run1.csv
+Debe salir kp_yaw 1.0, kd_yaw 0.6, max_angular 1.0, linear_speed 0.1, bias_w 0.0.
+
+Ejecutar 3A (1 vez):
+  timeout -s INT 150 python3 scripts_pdi/cuadrado_controller.py --ros-args $(python3 scripts/rc1_args.py robot_real experimento=cuadrado_abierto log_csv=csv/exp3a_real.csv); ros2 topic pub -r 10 -t 30 /cmd_vel geometry_msgs/msg/Twist "{}"
+Ejecutar 3B (N = run1, run2, run3):
+  N=run1
+  timeout -s INT 180 python3 scripts_pdi/cuadrado_controller.py --ros-args $(python3 scripts/rc1_args.py robot_real experimento=cuadrado log_csv=csv/exp3b_real_$N.csv); ros2 topic pub -r 10 -t 30 /cmd_vel geometry_msgs/msg/Twist "{}"
+
+Notas: el nodo termina con FIN (≈ 90-110 s). Con timeout / Ctrl+C antes de FIN el robot real conserva la última orden: por eso la orden de ceros
+a continuación y una persona en el interruptor. En 3B el cierre que imprime el nodo es de /odom; el real lo da la cinta.
+
+----------------------------------------------------------------------
+9. PRECAUCIONES
+----------------------------------------------------------------------
+  - Una persona con la mano en el interruptor; nadie toca el robot ni los cables durante la corrida. Despejar el cuadrado más 40-60 cm hacia afuera.
+  - Corte inmediato si el robot se sale ≈ 30 cm del recorrido previsto o se acerca a un obstáculo.
+  - Nodo original (sha256 de cuadrado_controller.py empieza por d618e71722c4153d), un solo /odom_corrector, batería >= 70 %, hora correcta.
+  - Un CSV y un bag por corrida con nombre distinto; copiar al clon desde el host (no commit desde el Pi).
+  - Anotar en la hoja (columnas cierre_real_cm y yaw_acum_deg, filas 3A y 3B, planta real) y, por cada re-sintonía, `cambio=...` en notas.

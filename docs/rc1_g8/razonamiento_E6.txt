@@ -1,0 +1,142 @@
+RC-1 · GRUPO 8 — RAZONAMIENTO PARA PREDECIR E6 (RECTA REAL 1D, DESVÍO LATERAL < 5 cm)
+Fecha: 13-nov-2026
+
+Este archivo NO contiene las predicciones del grupo. Son material para razonarlas: un modelo simple, sus resultados y lo que
+implican. Las predicciones las escribe el grupo y se suben a git ANTES de correr cada prueba.
+
+----------------------------------------------------------------------
+1. QUÉ PIDE E6
+----------------------------------------------------------------------
+- Documento oficial: «Robot real, recta (1D): 3 corridas con CSV y cinta; desvío lateral final medido ≤ 5 cm. [Cátedra: ajustar.]»
+- Respuesta del docente: son 3 corridas evaluando que el desvío lateral final sea menor de 5 cm (calificación del repositorio).
+  En la sustentación en vivo se hace una sola corrida.
+- Pendiente de confirmar con el docente: si cada una de las 3 debe cumplir o basta el promedio. Planificar por la lectura más
+  estricta (cada una).
+- Reglas del nodo para el robot real: línea virtual con -p line_offset:=0.10 (el robot arranca 10 cm a la izquierda de la línea),
+  SIN bias_w (el robot real ya trae su propio sesgo), velocidad suave linear_speed 0.10 m/s, nodo original sin modificar.
+
+----------------------------------------------------------------------
+2. PUNTO DE PARTIDA: LAS GANANCIAS DEL SIMULADOR
+----------------------------------------------------------------------
+La 1D del simulador usó Kp = 3, Ki = 0.5, Kd = 4 (error final 0.30 cm, asentamiento 5.80 s). Son las ganancias de partida que pide
+el documento («las ganancias del simulador»). Diferencias con el robot real:
+  - Velocidad: 0.20 m/s en el simulador, 0.10 m/s en el robot (lazo más lento: asentamiento ideal ≈ 10 s en vez de ≈ 5-6 s).
+  - Sin bias_w en el robot real.
+  - Retardo y frecuencia de /odom: ≈ 11 Hz (períodos 0.07 a 0.15 s) y un retardo efectivo de la orden de giro de ≈ 0.5-0.65 s
+    medido en el giro de 90° (el período de la oscilación con Kp 10 fue ≈ 2.6 s en el suelo).
+
+----------------------------------------------------------------------
+3. EL MODELO USADO PARA ESTIMAR
+----------------------------------------------------------------------
+Es la planta de core_cuadrado.py (función simular): uniciclo con un retardo de actuador de primer orden (constante tau) y un retardo
+puro en la pose que ve el controlador ("retardo", en muestras de 1/30 s). El controlador es el mismo del nodo (PID de la línea,
+w = -PID(e), e = d + line_offset), con v = 0.10 m/s, line_offset 0.10 m, max_angular 1.0.
+Validación: con v = 0.20, tau 0.15 s y retardo 3 muestras (como el simulador), el modelo da error final 0.48 cm y asentamiento ±2 cm
+a los 5.8 s, igual que lo medido en el simulador (0.30 cm y 5.80 s).
+
+LÍMITES DEL MODELO (no lo traten como un hecho):
+  - No modela el muestreo de /odom a 11 Hz (la pose queda fija entre actualizaciones).
+  - No modela fricción estática (zona muerta de los motores) ni patinaje.
+  - Lo que se mide con cinta es el desvío REAL; incluye la diferencia entre /odom y la realidad, que el modelo no tiene.
+  - tau y retardo del robot real son estimaciones; el resultado depende mucho de ellos.
+
+----------------------------------------------------------------------
+4. RESULTADOS DEL MODELO (error lateral e en cm, v = 0.10 m/s, sin sesgo, línea a 10 cm)
+----------------------------------------------------------------------
+4.1 Ganancias de partida (Kp 3, Ki 0.5, Kd 4) según el retardo efectivo (tau + retardo de pose):
+
+  Retardo efectivo      Error final   Amplitud (min / max)   Cruces de e = 0   ¿Termina en 60 s?
+  0.3 s (tau 0.3, 9)       +4.5 cm       -10.4 / +10.0            4                 sí
+  0.5 s (tau 0.4, 15)     -12.7 cm       -18.4 / +22.1            5                 sí
+  0.67 s (tau 0.5, 20)    -21.8 cm       -39.8 / +24.9            3                 NO
+
+4.2 Variantes (un parámetro cambiado respecto de la partida):
+
+                          retardo 0.3 s        retardo 0.5 s        retardo 0.67 s
+  Partida (3 / 0.5 / 4)     +4.5 (4 cruces)     -12.7 (5 cruces)     no termina
+  Kp 1.5                    -8.0                -22.3                +31.2
+  Kp 1.0                    +4.2                -11.9                -29.6
+  Kd 2                      no termina          no termina           no termina
+  Kd 1                      no termina          no termina           no termina
+  Ki 0 (P+D)                +0.7 (4 cruces)     +3.5 (4 cruces)      +10.0 (4 cruces)
+  Kp 1, Ki 0, Kd 4          +0.07 (2 cruces)    +0.13 (2 cruces)     +0.11 (2 cruces)
+
+4.3 Con un sesgo de motores inyectado (el real tiene el suyo; valores 0.03 y 0.06 rad/s):
+
+  Configuración           sesgo 0.03: retardo 0.3 / 0.5 s     sesgo 0.06: retardo 0.3 / 0.5 s
+  3 / 0.5 / 4 (partida)       +3.5 / +16.6                        +2.6 / +17.2
+  3 / 0 / 4                   +1.6 / +4.1                         +2.5 / +4.7
+  1 / 0 / 4                   +3.1 / +3.1                         +6.0 / +6.1
+  3 / 0.1 / 4                 +1.1 / +4.4                         +1.5 / +4.4
+  1 / 0.1 / 4                 -0.3 / +0.0                         +1.0 / +1.1
+
+----------------------------------------------------------------------
+5. LO QUE SUGIEREN LOS NÚMEROS (con la reserva de la sección 3)
+----------------------------------------------------------------------
+- [Probable] Con las ganancias del simulador, el robot real puede NO cumplir los 5 cm. El resultado depende del retardo efectivo:
+  con 0.3 s queda cerca del límite y con 0.5 s o más oscila ±20 cm o más.
+- [Probable] La integral (Ki 0.5) es la que más desestabiliza en el modelo: con Ki 0 el error final baja bastante.
+- [Probable] Bajar Kd empeora (más oscilación); no es la dirección a seguir.
+- [Probable] Sin integral el sesgo del robot queda sin compensar (error permanente ≈ sesgo / Kp; con Kp 1 son 3-6 cm). Por eso
+  el candidato razonado es un Ki pequeño (≈ 0.1), no cero.
+- [Especulando] En el modelo, Kp 1 / Ki 0.1 / Kd 4 es el más robusto frente al retardo y al sesgo. Habría que comprobarlo en el robot.
+- La planta real (zona muerta, patinaje, /odom a 11 Hz) puede dar resultados peores que el modelo; el modelo sirve para ordenar
+  hipótesis, no para sustituir la corrida.
+
+----------------------------------------------------------------------
+6. CÓMO USARLO PARA ESCRIBIR LAS PREDICCIONES (de la primera experimental)
+----------------------------------------------------------------------
+Decidan con la tabla 4.1 qué retardo esperan y escriban RANGOS, no un punto:
+  1. Desvío lateral final esperado (cm), con rango. ¿Lo esperan < 5 cm?
+  2. Cruces de la línea virtual: ¿cuántos y de qué amplitud?
+  3. ¿Terminará con FIN en ≈ 20 s, o seguirá oscilando (sin FIN a los 40 s)?
+  4. Un criterio comprobable en el CSV (por ejemplo: «|e_line| < 2 cm en los últimos 5 s», o «como máximo N cruces de 0»).
+Escriban también el razonamiento (por qué ese retardo) y subidlas antes de correr. Las de las corridas oficiales se escriben después
+de las experimentales y dicen que se redactaron después de ellas, como en E5.
+
+----------------------------------------------------------------------
+7. PLAN DE UNA HORA PARA E6 (3 experimentales + 3 oficiales)
+----------------------------------------------------------------------
+  Montaje de marcas y comprobaciones ...................... 10-15 min
+  3 experimentales (≈ 4 min cada una) ..................... 12-15 min
+  Decidir ganancias finales y escribir predicciones ....... 5-8 min
+  3 oficiales (≈ 4 min cada una, con medida) .............. 12-15 min
+  Margen para fallos ....................................... 10 min
+Cada corrida dura ≈ 20 s de movimiento; lo que consume tiempo es medir y reposicionar.
+
+Reglas:
+  - Experimental 1: ganancias de partida SIN cambios. Mide cómo se comporta el robot real.
+  - Experimentales 2 y 3: un solo parámetro por corrida, en el orden Kp → Kd → Ki, y solo si la primera mostró un problema.
+    Cada cambio cuenta como re-sintonía (máximo 3 en la Parte E; ya se usó 1: kp_yaw 10 → 1.0), con su predicción escrita antes.
+  - Elegir la configuración por ESTABILIDAD (poca variación entre corridas), no por el mejor valor de una sola corrida.
+    Si cada corrida cumple con probabilidad p, las tres cumplen con p al cubo: p = 0.9 → 73 %; p = 0.8 → 51 %; p = 0.7 → 34 %.
+  - Oficiales: las tres seguidas, con la misma configuración, y se reportan todas aunque alguna salga mal.
+
+----------------------------------------------------------------------
+8. MARCAS Y MEDICIÓN
+----------------------------------------------------------------------
+  - Marca de inicio (cruz y rumbo) y línea virtual a 10 cm a la derecha de la trayectoria de arranque, paralela, de 2 m.
+  - Robot alineado con un tope fijo (regla en «L») en cada corrida: un error de 2° de rumbo inicial son ≈ 7 cm a 2 m.
+  - Al terminar (FIN), con el robot detenido, medir con cinta la distancia perpendicular del centro del robot a la línea. Dos personas.
+  - Espacio: 2 m de recta más margen de 15 cm.
+
+----------------------------------------------------------------------
+9. COMANDOS (una corrida; cambiar N cada vez, siempre explícito)
+----------------------------------------------------------------------
+Verificar las banderas (solo imprime):
+  python3 scripts/rc1_args.py robot_real experimento=recta line_offset=0.10 ki=0.5 log_csv=csv/exp1d_real_exp1.csv
+Debe salir kp 3.0, ki 0.5, kd 4.0, line_offset 0.1, bias_w 0.0, linear_speed 0.1.
+
+Ejecutar (experimentales: exp1, exp2, exp3; oficiales: run1, run2, run3):
+  N=exp1
+  timeout -s INT 40 python3 scripts_pdi/cuadrado_controller.py --ros-args $(python3 scripts/rc1_args.py robot_real experimento=recta line_offset=0.10 ki=0.5 log_csv=csv/exp1d_real_$N.csv); ros2 topic pub -r 10 -t 30 /cmd_vel geometry_msgs/msg/Twist "{}"
+
+Notas: el nodo termina cuando recorre 2 m (FIN). Con timeout / Ctrl+C antes de FIN el robot real conserva la última orden; por eso se
+añade al final la orden de parada. Para una variante, cambiar el parámetro en la línea de rc1_args.py (por ejemplo ki=0.1).
+
+----------------------------------------------------------------------
+10. PRECAUCIONES
+----------------------------------------------------------------------
+  - Una persona con la mano en el interruptor; nadie toca el robot ni los cables durante la corrida.
+  - Nodo original (sha256 de cuadrado_controller.py empieza por d618e71722c4153d), un solo /odom_corrector, batería ≥ 70 %, hora correcta.
+  - Un CSV con nombre distinto por corrida; copiarlos al repositorio desde el clon (no desde el Pi).
