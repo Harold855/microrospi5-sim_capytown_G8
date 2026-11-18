@@ -58,7 +58,7 @@ En la experimental 13 se observó una **desviación física aproximada de 5 cm h
 
 **Justificación:** las experimentales 12 y 13 terminaron con errores estimados por `/odom` de ≈ 3 cm, y solo la 13 tuvo estimación física (≈ 5 cm). No hay evidencia suficiente para una distribución de errores físicos ni para un porcentaje de éxito.
 
-**Verificación:** cinta perpendicular desde el centro del robot a la raya negra, conservando el lado (derecha/izquierda), contra ≤ 5 cm. 
+**Verificación:** cinta perpendicular desde el centro del robot a la raya negra, conservando el lado (derecha/izquierda), contra ≤ 5 cm. Anotar por separado el `e_line` final de `/odom` y la orientación física.
 
 ## Hipótesis 3. Cruces de la línea y magnitud del sobrepaso
 
@@ -89,7 +89,7 @@ En la experimental 13 se observó una **desviación física aproximada de 5 cm h
 | Intento | Ganancias (Kp / Ki / Kd) | Tiempo a `FIN` | Yaw final `/odom` | Desviación lateral física | Estado |
 |---|---|---:|---:|---:|---|
 | **Run 1** | 1.0 / 0.1 / 8.0 | 20.9 s | +2.0° | **0.6 cm derecha** | Válida |
-| **Run 2** | 1.0 / 0.1 / 8.0 | 21.0 s | −0.8° | **1.5 cm derecha** | Válida |
+| **Run 2** | 1.0 / 0.1 / 8.0 | 21.0 s | −0.8° | **1.5 cm izquierda** | Válida |
 | **Run 3** | No se confirmo | No aportan | No aportan | No se evaluo | Ocurrio un fallo físico durante la corrida (el Roscar se trabo con la cinta métrica y no pudo avanzar) |
 | **Run 4** | No se confirmo | No aportado | No se aportan | **6 cm izquierda** | Invalida(Robot mal posicionado al inicio, excede el límite) |
 | **Run 5** | 1.0 / 0.1 / 8.0 | 21.0 s | +1.6° | **0.5 cm derecha** | Válida (anotada en la hoja como `run3`, con la nota «CSV run5») |
@@ -113,6 +113,18 @@ Las tres corridas consideradas válidas (`run1`, `run2`, `run5`):
 **`/odom` frente a la cinta.** Según `/odom` el error lateral final es de ≈ 2.7–3.8 cm, mientras que la cinta mide 0.5–1.5 cm. Hay un desfase sistemático de ≈ 3 cm entre ambos, de causa no determinada con estos datos. **El criterio de E6 lo da la cinta**, no `/odom`.
 
 **Sobre el analizador.** Las líneas `[cumple]/[NO cumple]` que imprime `rc1_analiza_real.py --criterios e6` se refieren a las predicciones de la experimental 1 (Kp 3.0, Ki 0.5, Kd 4.0). **No** son una evaluación de estas corridas ni de las hipótesis de este documento.
+
+## B.3 Registro e integridad de las evidencias
+
+- Se conservan los CSV y los `*.nodo.log` de **todos** los intentos (`run1`–`run5`) y de las exploratorias, incluidos incidentes y descartes.
+- En la hoja de resultados: `run1` = 0.6 cm derecha; `run2` = 1.5 cm izquierda; tercera corrida válida (CSV `run5`) = 0.5 cm derecha, con nota del descarte de `run3` (fallo físico, sin medición válida) y de `run4` (6 cm, mala colocación inicial). No se eliminan silenciosamente.
+- El mensaje automático de `rc1_correr.sh` que sugiere anotar `ki=0.5` es una plantilla fija **incorrecta para estas corridas**: el controlador confirmó en su inicio `ki=0.1`.
+- Se distinguen tres magnitudes: **error físico lateral** (cinta), **`e_line` estimado** (`/odom`) y **«error de cierre» longitudinal** (≈ 200 cm).
+
+## Reglas pendientes de confirmar con el docente
+
+1. **Re-sintonías.** Frente a la configuración de partida del simulador (Kp 3.0 / Ki 0.5 / Kd 4.0, `kp_yaw` 10), la configuración final cambia `kp_yaw` (E5), `Kp`, `Ki` y `Kd`: **cuatro cambios**, con un límite de tres en la Parte E. Falta confirmar si el límite cuenta las pruebas exploratorias o solo la configuración final frente a la de partida, y si un cuarto cambio está permitido.
+2. **Repeticiones.** Falta confirmar si se admiten repeticiones por fallo físico o de colocación, o si solo cuentan las primeras tres corridas. Hasta entonces, no se afirma que `run1`, `run2` y `run5` sean las tres corridas oficialmente aceptadas.
 
 ## Conclusión
 

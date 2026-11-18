@@ -57,7 +57,7 @@ esac
 [ "$BAG" = "0" ] && BAGDIR=""
 
 ARGS_CMD=(python3 scripts/rc1_args.py robot_real "${BASE[@]}" "${EXTRA[@]}" "log_csv=$CSV")
-NODO_CMD="timeout -s INT $T python3 scripts_pdi/cuadrado_controller.py --ros-args \$(${ARGS_CMD[*]})"
+NODO_CMD="timeout --foreground -s INT $T python3 scripts_pdi/cuadrado_controller.py --ros-args \$(${ARGS_CMD[*]})"
 STOP_CMD='ros2 topic pub -r 10 -t 30 /cmd_vel geometry_msgs/msg/Twist "{}"'
 
 echo "=== rc1_correr: $PRUEBA ${NOMBRE:-(sin nombre)} ==="
@@ -119,7 +119,7 @@ LOG="${CSV%.csv}.nodo.log"
 echo "--- corriendo (límite $T s; si sale FIN el nodo termina solo) ---"
 ARGS=$("${ARGS_CMD[@]}" 2>/dev/null)
 # shellcheck disable=SC2086
-timeout -s INT "$T" python3 scripts_pdi/cuadrado_controller.py --ros-args $ARGS 2>&1 | tee "$LOG"
+timeout --foreground -s INT "$T" python3 scripts_pdi/cuadrado_controller.py --ros-args $ARGS 2>&1 | tee "$LOG"
 
 parar
 FIN=$(grep -m1 'FIN\. error de cierre' "$LOG" || true)
