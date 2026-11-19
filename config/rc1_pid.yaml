@@ -1,9 +1,8 @@
 # RC-1 · Grupo 8 · S-003 · RosCar 4 — ganancias del nodo cuadrado_controller (curso)
 #
 # Dos bloques, uno por planta, porque el simulador y el robot real se sintonizan por separado
-# (el reto lo exige). Cada bloque trae `estado:`. Mientras diga PENDIENTE, los valores son solo
-# el punto de partida (los de fábrica del nodo del curso) y NO las ganancias finales.
-# Cuando el grupo termine de sintonizar: poner los valores finales y cambiar `estado:` a FINAL.
+# (el reto lo exige). Cada bloque trae `estado:`. FINAL = ganancias con las que se hicieron las
+# corridas oficiales de cada planta.
 #
 # Uso (imprime las banderas -p con el punto decimal que exige ROS 2):
 #   python3 scripts/rc1_args.py simulador experimento=cuadrado log_csv=csv/exp3b_sim_run1.csv
@@ -11,35 +10,37 @@
 # Un parámetro por prueba: anota cada cambio en hoja_resultados.csv (columna notas).
 
 simulador:
-  estado: PENDIENTE            # PENDIENTE | FINAL
-  planta: "yahboomcar_sim, arena_rc1, noise:=low (valor de trabajo)"
+  estado: FINAL                # valores de las pruebas E2, E3 y E4 (arena_rc1)
+  planta: "yahboomcar_sim, arena_rc1, noise:=low (valor de trabajo) y una corrida con medium"
   cuadrado_controller:
     ros__parameters:
       linear_speed: 0.20       # m/s
-      kp: 3.0                  # línea (error en m)
-      ki: 0.0
-      kd: 4.0
-      kp_yaw: 3.0              # giro (error en rad)
+      kp: 3.0                  # línea (error en m); 1B/1C/1D: Kp 3
+      ki: 0.5                  # 1D y 3C: Ki 0.5 (1A-1C y 3B: Ki 0.0, se pasa por línea de comandos)
+      kd: 4.0                  # 1C, 1D, 3B y 3C: Kd 4
+      kp_yaw: 10.0             # giro (error en rad): combinación propia 2p1
       ki_yaw: 0.0
-      kd_yaw: 0.4
+      kd_yaw: 0.6              # 2p1: sobreimpulso 0 %, asentamiento 1.01 s
       integral_limit: 0.5      # anti-windup
       max_angular: 2.0         # rad/s
-      bias_w: 0.0              # solo se inyecta en las pruebas del simulador (1A-1D, 3B, 3C)
+      bias_w: 0.0              # se inyecta por línea de comandos: 0.06 (recta), 0.03 (3B), 0.05 (3C)
       line_offset: 0.0         # 0.10 en la recta del Experimento 1
 
 robot_real:
-  estado: PENDIENTE            # PENDIENTE | FINAL  (giro: kp_yaw 1.0, kd_yaw 0.6, max_angular 1.0 vigentes; recta y cuadrado aún sin decidir)
+  estado: FINAL                # valores de las corridas oficiales de E6 y E7-3B (ver notas)
   planta: "RosCar 4, ROS_DOMAIN_ID=8, /odom de odom_corrector (r=0.03145, b_eff=0.2138 del RC-0)"
   cuadrado_controller:
     ros__parameters:
-      linear_speed: 0.10       # velocidades suaves al inicio (Anexo C); subir solo tras un giro90 correcto
-      kp: 3.0                  # partida: ganancias del simulador (Parte E.4); re-sintonizar, máx. 3 veces
-      ki: 0.0
-      kd: 4.0                  # OJO: /odom real ~11 Hz con timer de 30 Hz: Kd puede hacer vibrar w
-      kp_yaw: 1.0              # re-sintonía #1 (13-nov): 10.0 -> 1.0 porque con 10.0 el giro real oscilaba ±15-20° (ver docs/rc1_g8/registro_E5_giro_real.md)
+      linear_speed: 0.10       # velocidades suaves (Anexo C)
+      kp: 1.0                  # partida (simulador): 3.0
+      ki: 0.1                  # partida: 0.5 (con 0.5 la recta real oscila). OJO: la plantilla `recta` de rc1_correr.sh fija ki=0.5; pasar ki=0.1
+      kd: 8.0                  # partida: 4.0 (amortigua la oscilación causada por el retardo de /odom y de los motores)
+      kp_yaw: 1.0              # partida: 10.0 (con 10.0 el giro real oscilaba ±15-20°; ver docs/rc1_g8/registro_E5_giro_real.md)
       ki_yaw: 0.0
-      kd_yaw: 0.6
+      kd_yaw: 0.3              # 3B final. E5 (giro90 real) se acreditó con kd_yaw 0.6: para repetirlo pasar kd_yaw=0.6
       integral_limit: 0.5
-      max_angular: 1.0
+      max_angular: 1.0         # simulador: 2.0
       bias_w: 0.0              # NO usar en el robot real: ya trae su propio sesgo
-      line_offset: 0.0         # 0.10 en la recta
+      line_offset: 0.0         # 0.10 en la recta (E6)
+# Cambios frente a la partida del simulador: kp_yaw (E5), kp, ki, kd (E6) y kd_yaw (3B): cinco parámetros, con un
+# máximo de tres re-sintonías en la Parte E; consulta al docente sin respuesta. Detalle en docs/rc1_g8/reconstruccion_E6_oficiales.md.
