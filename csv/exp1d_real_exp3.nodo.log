@@ -1,0 +1,10 @@
+[INFO] [1794937244.473247564] [cuadrado_controller]: cuadrado_controller listo: recta (pid) kp=3.0 ki=0.5 kd=4.0  v=0.1 m/s. Esperando /odom...
+[INFO] [1794937269.189388290] [cuadrado_controller]: FIN. error de cierre = 200.7 cm, yaw acumulado = 4.9 deg, tiempo = 24.1 s
+Traceback (most recent call last):
+  File "/root/microrospi5-sim_capytown_G8/scripts_pdi/cuadrado_controller.py", line 158, in <module>
+    main()
+  File "/root/microrospi5-sim_capytown_G8/scripts_pdi/cuadrado_controller.py", line 151, in main
+    node.pub.publish(Twist())       # frena al salir
+  File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/publisher.py", line 70, in publish
+    self.__publisher.publish(msg)
+rclpy._rclpy_pybind11.RCLError: Failed to publish: publisher's context is invalid, at ./src/rcl/publisher.c:389
