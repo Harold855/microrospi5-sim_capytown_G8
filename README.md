@@ -70,7 +70,8 @@ El nodo de la clase (`scripts_pdi/cuadrado_controller.py` y `core_cuadrado.py`) 
 ## Estado de la verificación
 
 - **Probado:** 25 pruebas sin ROS; compilación y ejecución de `sim_robot` con ROS 2 Humble en WSL; el nodo de la clase corre sin cambios contra `arena_rc1` y reproduce las cifras de su simulador de Python (experimento 1, sin ruido).
-- **No probado:** `sim.launch.py` completo con RViz sobre `arena_rc1`, Nav2 con el simulador, y todo lo del robot real.
+- **No probado:** Nav2 con el simulador.
+- **Probado en el laboratorio (nov. 2026):** `sim.launch.py` con RViz sobre `arena_rc1` en WSL2, y el robot real (RosCar 4) en E5 giro de 90°, E6 recta y E7 cuadrado (3A y 3B); resultados en `informe.pdf`, `hoja_resultados.csv`, `csv/` y `bags/`.
 - Con muchas pruebas en paralelo la CPU se satura y el PID da resultados falsos: correr una a la vez (o ≤ 5).
 - El simulador **no** modela el derrape de las 4 ruedas ni el retardo de `/odom`.
 
@@ -80,7 +81,7 @@ El nodo de la clase (`scripts_pdi/cuadrado_controller.py` y `core_cuadrado.py`) 
 |---|---|
 | Robot / dominio | RosCar 4 · `ROS_DOMAIN_ID=8` (Pi y simulador) |
 | Nivel de ruido | `noise:=low` de trabajo; 1 corrida por prueba con `noise:=medium` |
-| Ganancias finales | [COMPLETAR] — simulador y robot real, por separado, en `config/rc1_pid.yaml` |
+| Ganancias finales | **Simulador:** Kp 3.0, Ki 0.5, Kd 4.0; `kp_yaw` 10, `ki_yaw` 0, `kd_yaw` 0.6. **Robot real:** Kp 1.0, Ki 0.1, Kd 8.0; `kp_yaw` 1.0, `ki_yaw` 0, `kd_yaw` 0.3 (E5 se acreditó con `kd_yaw` 0.6). Por planta en `config/rc1_pid.yaml`; el cambio entre ambas y su motivo, en `docs/rc1_g8/transferencia.md` |
 | Odometría del robot real | `/odom` publicada por `odom_corrector` con `r = 0.03145`, `b_eff = 0.2138` (calibración del RC-0) |
 
 **Archivos del RC-1:** `config/rc1_pid.yaml`, `hoja_resultados.csv`, `csv/`, `plots/`, `bags/`, `sim_log.txt`, `informe.pdf` y `docs/rc1_g8/` (matriz de pruebas, predicciones, tabla de transferencia, plantilla del informe).
