@@ -22,7 +22,7 @@ import sys
 
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 HOJA = os.path.join(RAIZ, "hoja_resultados.csv")
-CORRIDAS = ("run1", "run2", "run3", "medium")
+CORRIDAS = ("run1", "run2", "run3", "medium", "run4")   # run4 = corrida adicional (se crea la fila si no existe)
 
 
 def main(argv):
@@ -40,6 +40,16 @@ def main(argv):
     cab = filas[0]
     i_odom, i_real, i_yaw, i_notas = (cab.index(c) for c in ("cierre_odom_cm", "cierre_real_cm", "yaw_acum_deg", "notas"))
     objetivo = [f for f in filas[1:] if f[0] == prueba and f[1] == "sim" and f[i_notas].split(";")[0].strip() == corrida]
+    if not objetivo and corrida == "run4":
+        base = next((x for x in filas[1:] if x[0] == prueba and x[1] == "sim" and x[2] == "low"), None)
+        if base is None:
+            sys.exit(f"No encuentro una fila {prueba} sim low para copiar las columnas.")
+        nueva = list(base)
+        for c in ("prediccion", "cierre_odom_cm", "cierre_real_cm", "yaw_acum_deg", "notas"):
+            nueva[cab.index(c)] = ""
+        nueva[i_notas] = "run4"
+        filas.append(nueva)
+        objetivo = [nueva]
     if len(objetivo) != 1:
         sys.exit(f"Esperaba 1 fila de {prueba} {corrida} y encontre {len(objetivo)}. Revisa hoja_resultados.csv.")
     f = objetivo[0]
