@@ -42,3 +42,4 @@ prueba,planta,noise,kp,ki,kd,kp_yaw,ki_yaw,kd_yaw,prediccion,cierre_odom_cm,cier
 3B,real,,1.0,0.1,8.0,1.0,0.0,0.3,,4.4,,,exp3; cierre_odom_cm=4.4; piso=laboratorio_cinta_masking; exploratoria; sin medida fisica registrada; kd_yaw por confirmar; FIN 102.9 s
 3B,real,,1.0,0.1,8.0,1.0,0.0,0.3,,3.7,25.9,360,exp4; cierre_odom_cm=3.7; cierre_real_cm=25.9; yaw_acum_deg=360; ancho_cm=12; alto_cm=23; piso=laboratorio_cinta_masking; exploratoria; FIN 102.2 s; rumbo final recto
 3B,real,,1.0,0.1,8.0,1.0,0.0,0.3,,3.4,19.1,,exp5; cierre_odom_cm=3.4; cierre_real_cm=19.1; ancho_cm=14; alto_cm=13; piso=laboratorio_cinta_masking; exploratoria; FIN 103.5 s
+3A,sim,low,,,,,,,,5.9,21,374.3,run4; cierre_odom_cm=5.9; cierre_real_cm=21; yaw_real_deg=374.3; corrida adicional; la cinta virtual de run2 no se conservo
