@@ -253,13 +253,13 @@ Columnas: `prueba, planta, noise, kp, ki, kd, kp_yaw, ki_yaw, kd_yaw, prediccion
 
 ![Giro real con `kp_yaw` 1.0 (corrida r3): sin sobreimpulso, termina a 88.5° según `/odom` y 91° con el transportador.](../../plots/exp2_real_giro90_r3.png){width=90%}
 
-### E6 — recta real (pendiente de las corridas)
+### E6 — recta real (hecho)
 
-Hecho: predicciones de la corrida experimental 1 subidas (`docs/rc1_g8/predicciones_E6_exp1.md`, commit `10c9a56`), razonamiento con el modelo de la recta con retardo (`razonamiento_E6.txt`), montaje y comandos preparados. Falta: las corridas, las medidas con cinta, los CSV y las gráficas. Criterio del docente: tres corridas, con al menos una con desvío lateral final < 5 cm.
+Hecho: predicciones de la corrida experimental 1 subidas (`docs/rc1_g8/predicciones_E6_exp1.md`, commit `10c9a56`), razonamiento con el modelo de la recta con retardo (`razonamiento_E6.txt`), montaje y comandos preparados. Corridas oficiales hechas: desvío con cinta 0.6 / 1.5 / 0.5 cm, con CSV y gráficas en el repositorio. Criterio del docente: tres corridas, con al menos una con desvío lateral final < 5 cm.
 
-### E7 y bonus — cuadrado real (pendiente)
+### E7 y bonus — cuadrado real (hecho)
 
-3A una vez y 3B tres veces, con cinta y bags; cierre medio de 3B ≤ 25 cm y menor que el de 3A. Aún no se han hecho.
+3A una vez y 3B tres veces, con cinta y bags; cierre medio de 3B ≤ 25 cm y menor que el de 3A. Hechas: 3A = 107.9 cm; 3B oficiales (piso del laboratorio) = 10.0 / 16.0 / 27.0 cm, media 17.7 cm. El BONUS se evalúa solo en la demostración en vivo.
 
 ### Lo aprendido al pasar al robot real
 

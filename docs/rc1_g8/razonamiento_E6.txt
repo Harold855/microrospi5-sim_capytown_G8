@@ -10,8 +10,7 @@ implican. Las predicciones las escribe el grupo y se suben a git ANTES de correr
 - Documento oficial: «Robot real, recta (1D): 3 corridas con CSV y cinta; desvío lateral final medido ≤ 5 cm. [Cátedra: ajustar.]»
 - Respuesta del docente: son 3 corridas evaluando que el desvío lateral final sea menor de 5 cm (calificación del repositorio).
   En la sustentación en vivo se hace una sola corrida.
-- Pendiente de confirmar con el docente: si cada una de las 3 debe cumplir o basta el promedio. Planificar por la lectura más
-  estricta (cada una).
+- Confirmado con el docente: basta con que al menos una de las 3 tenga desvío lateral final < 5 cm.
 - Reglas del nodo para el robot real: línea virtual con -p line_offset:=0.10 (el robot arranca 10 cm a la izquierda de la línea),
   SIN bias_w (el robot real ya trae su propio sesgo), velocidad suave linear_speed 0.10 m/s, nodo original sin modificar.
 

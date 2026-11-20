@@ -2,7 +2,7 @@
 
 **Para quién:** todos los integrantes. La defensa sortea a **uno**, hace **4 preguntas del banco**, **sin código ni informe a la vista**, y **al menos una** es del trabajo de **otro rol**. El puntaje (2 pt) es del grupo: 0.5 completa y justificada · 0.3 correcta sin justificación · 0.2 parcial · 0.
 **Cómo usarla:** cada pregunta tiene una *respuesta corta* (30 s), el *porqué* y *los datos propios* que la respaldan. Memoricen los datos; justificar vale más que acertar.
-**Estado:** E1–E6 con datos finales; **los resultados oficiales de E7 (3B × 3) están marcados `[Pendiente E7]`** y se completan al terminar. Todo lo que no se midió aquí se dice como «no sabemos».
+**Estado:** E1–E6 con datos finales; **E7 también tiene datos finales:** las tres 3B oficiales (piso del laboratorio) dieron 10.0 / 16.0 / 27.0 cm, media 17.7 cm. Todo lo que no se midió aquí se dice como «no sabemos».
 
 ## 0. Datos que hay que saber de memoria
 
@@ -18,7 +18,7 @@
 | E6 recta real | 0.6 cm der., 1.5 cm izq., 0.5 cm der. (meta ≤ 5 cm). Con `Kd` 4 en pruebas previas: ≈ 10 y ≈ 2 cm |
 | E7-3A (lazo abierto) | cierre `/odom` 97.4 cm · **cierre real 107.9 cm** · yaw `/odom` 381.7° · `FIN` 87.9 s · primer giro ≈ 115° |
 | E7-3B exploratorias | cierre real > 36, 36.5, 25.9, 19.1 cm; cierre `/odom` 2.0 / 1.8 / 3.7 / 3.4 cm; `FIN` ≈ 102–110 s |
-| E7-3B oficiales | `[Pendiente E7]` run1 / run2 / run3 y media (meta ≤ 25 cm y < 3A) |
+| E7-3B oficiales | run1 / run2 / run3 = 10.0 / 16.0 / 27.0 cm (cinta); media 17.7 cm (meta ≤ 25 cm y < 3A = 107.9 cm) |
 | Sensibilidad angular | 1° de error de yaw = 2·tan(1°) = **3.49 cm** a los 2 m (≈ 9.8 cm en cuatro lados) |
 | Simulador | 1D error final 0.30 cm · giro propio (2p): sobreimpulso 0 %, asentamiento 1.01 s · 3B: `/odom` 0.5 cm frente a **58.7 cm real** |
 
@@ -98,7 +98,7 @@ Con la forma estándar (`integral = integral_prev + e·dt`; D sobre el error):
 - **Línea:** 3.0 / 0.5 / 4.0 → **1.0 / 0.1 / 8.0** (menos `Kp` y `Ki`, más `Kd`), porque con retardo ≈ 0.7 s y `/odom` a 11 Hz el sistema oscilaba (±13 cm en `/odom`, ≈ 30 cm reales).
 - **Giro:** `kp_yaw` 10 → 1.0 (oscilaba ±15–20°). En 3B, `kd_yaw` 0.6 → 0.3 por el chatter.
 - **`max_angular`** 2.0 → 1.0 por seguridad y por la planta.
-- **Declarar** que son cinco parámetros distintos (`kp_yaw`, `kp`, `ki`, `kd`, `kd_yaw`) frente a un máximo de tres, y que se consultó al docente `[completar con su respuesta]`.
+- **Declarar** que son cinco parámetros distintos (`kp_yaw`, `kp`, `ki`, `kd`, `kd_yaw`) frente a un máximo de tres, y que la consulta al docente sobre ese límite no tuvo respuesta.
 
 ### 15. ¿Por qué el nodo frena si no llega /odom en 0.5 s y por qué el simulador frena si no llega /cmd_vel?
 - Son **vigilantes de seguridad** (watchdog): sin pose el nodo no puede controlar, y sin órdenes el simulador no mantiene movimiento. En ambos casos se pasa a velocidad cero.
@@ -106,7 +106,7 @@ Con la forma estándar (`integral = integral_prev + e·dt`; D sobre el error):
 
 ### 16. Muestren en su gráfica del cuadrado dónde se ve que /odom y la pose real se separan
 - Simulador: `plots/exp3c_sim_cinta_run2.png` (la figura del informe): `/odom` cierra a < 1 cm y la pose real queda a 13.4 cm; la separación se ve en las esquinas.
-- Real: no hay pose real continua; la separación se mide con la cinta al final. `[Completar con un PNG de 3B oficial: la trayectoria de /odom cierra, la posición física no]`.
+- Real: no hay pose real continua; la separación se mide con la cinta al final. PNG de 3B oficial: `plots/exp3b_real_run1.png`–`run3.png` (la trayectoria de `/odom` cierra a 1.4–2.3 cm; la posición física, a 10–27 cm).
 
 ## 2. Lo que no conviene improvisar (y cómo responder con honestidad)
 
@@ -118,8 +118,6 @@ Con la forma estándar (`integral = integral_prev + e·dt`; D sobre el error):
 | «¿Por qué 3B no cierra bien si `/odom` dice 2 cm?» | El nodo reancla la línea en cada esquina (`self.sx, self.sy = x, y`, línea 213 de `core_cuadrado.py`) y usa rumbos nominales sobre `/odom`: no tiene referencia física del cuadrado, y los errores del piso se acumulan sin que el lazo los vea. |
 | «¿Cuál es la limitación principal?» | El lazo cierra sobre una medida (`/odom`) que no ve el deslizamiento. Mejora para RC-2: giroscopio como medida independiente del giro. |
 
-## 3. Pendiente de completar `[Pendiente E7]`
-- Resultados oficiales de 3B (run1–run3, media, comparación con 3A = 107.9 cm).
-- Respuesta del docente sobre re-sintonías y repeticiones.
-- PNG de la trayectoria de 3B para la pregunta 16.
+## 3. Lo que sigue abierto
+- Respuesta del docente sobre las re-sintonías (cinco parámetros frente a un máximo de tres).
 - Comprobar en el contenedor la fórmula exacta del PID para la pregunta 2.

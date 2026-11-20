@@ -131,8 +131,7 @@ def exp3():
                 dif = f"{num(r['cierre_real_cm']) - pr:+.1f}"
             out.append(f"| {p} | {c_txt} | {po:g} / {pr:g} | {med} | {dif} |")
     out.append("")
-    out.append("Meta de la rúbrica (E4): 3B o 3C con cierre real ≤ 40 cm. La redacción no aclara si es cada corrida, la media o al menos una; "
-               "pendiente de confirmar con el docente.\n")
+    out.append("Meta de la rúbrica (E4): 3B o 3C con cierre real ≤ 40 cm. El docente confirmó que se evalúa sobre la media de las tres corridas low.\n")
     out.append("| Lectura de E4 | 3B | 3C |")
     out.append("|---|---|---|")
     for lectura, f in (("Cada corrida low ≤ 40 cm", lambda v: all(x <= 40 for x in v)),

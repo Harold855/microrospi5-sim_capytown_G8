@@ -4,7 +4,7 @@
 
 Complementa a `estudio_simulacion_E1_E4.md`: allí está la anatomía del nodo del curso y del PID con todas las líneas de `core_cuadrado.py`. Aquí se resume lo necesario y se explica lo propio del robot real.
 
-**Etiquetas:** [Seguro] leído en el código, en un script del repositorio o medido · [Probable] inferencia fuerte · [Por confirmar] hay que comprobarlo en el contenedor (sección 12) · **[Pendiente E7]** se completa al terminar 3B.
+**Etiquetas:** [Seguro] leído en el código, en un script del repositorio o medido · [Probable] inferencia fuerte · [Por confirmar] hay que comprobarlo en el contenedor (sección 12)
 
 ---
 
@@ -237,7 +237,7 @@ CSV `csv/exp2_real_giro90_*.csv` (copia de `r3` en `exp2_real_giro90.csv`); PNG 
 
 **Según `/odom` (exp2 y exp4):** cada giro termina ≈ 1.5° corto (por la tolerancia `yaw_tol`) y los errores laterales máximos en las rectas son 0.8–3.8 cm; en el piso, el robot se pasaba 10–15° en algunas esquinas, que `/odom` no registra. Bajar `kd_yaw` a 0.3 redujo ≈ 10 veces el *chatter* de ω (74 → 7 muestras con ω < −0.2), pero no mejoró el cierre físico de forma medible.
 
-**Resultados oficiales de 3B:** **[Pendiente E7]** run1 / run2 / run3 y media (meta ≤ 25 cm y < 107.9 cm). Predicciones en `docs/rc1_g8/predicciones_E7_3B.md` (a subir antes de correr). **BONUS:** **[Pendiente E7]**.
+**Resultados oficiales de 3B** (piso del laboratorio): run1 / run2 / run3 = **10.0 / 16.0 / 27.0 cm** con cinta (`/odom`: 1.4 / 2.1 / 2.3 cm); media **17.7 cm**, cumple ≤ 25 cm y es menor que 3A (107.9 cm). Las corridas sobre caucho se catalogan como error por tipo de suelo y no cuentan. Predicciones en `docs/rc1_g8/predicciones_E7_3B.md`. **BONUS:** se evalúa solo en la demostración en vivo; la mejor corrida fue de 10.0 cm, en el límite.
 
 ---
 
@@ -316,7 +316,7 @@ Estima el avance contra la rúbrica. E6 y E7 cuentan solo las filas con etiqueta
 | El nodo llega a `FIN` | El propio nodo (v = ω = 0 en cada ciclo) | Sí |
 | El nodo muere antes de `FIN` | Nadie: el robot conserva la última orden. `parar()` publica ceros 3 s; la persona usa el interruptor | Parcial |
 | No llega `/odom` en 0.5 s | El nodo (`odom_timeout`) | Por diseño |
-| Ctrl+C | Debería activar `parar()`; con `timeout` sin `--foreground` no llegaba | **`--foreground` aplicado, prueba pendiente** |
+| Ctrl+C | Debería activar `parar()`; con `timeout` sin `--foreground` no llegaba | **`--foreground` aplicado y verificado (`exp1d_real_paro3`)** |
 
 ### Lo que hay que contar sin esconderlo
 - **Re-sintonías:** frente a la partida del simulador la configuración final cambia **cinco parámetros** (`kp_yaw`, `kp`, `ki`, `kd`, `kd_yaw`) y el reto permite **tres**. La consulta al docente está pendiente. Las pruebas exploratorias están todas guardadas.

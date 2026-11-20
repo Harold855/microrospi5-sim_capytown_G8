@@ -41,7 +41,7 @@ Cierre «`/odom`» = lo que cree el robot (y lo que imprime el nodo); cierre «r
 | 3C | low (las 3 corridas) | 8 / 24 | 0.1–0.7 / 13.4–41.6 | +17.6; -10.6; +11.3 |
 | 3C | medium | 15 / 48 | 0.4 / 56.8 | +8.8 |
 
-Meta de la rúbrica (E4): 3B o 3C con cierre real ≤ 40 cm. La redacción no aclara si es cada corrida, la media o al menos una; pendiente de confirmar con el docente.
+Meta de la rúbrica (E4): 3B o 3C con cierre real ≤ 40 cm. El docente confirmó que se evalúa sobre la media de las tres corridas low.
 
 | Lectura de E4 | 3B | 3C |
 |---|---|---|
@@ -55,5 +55,5 @@ Meta de la rúbrica (E4): 3B o 3C con cierre real ≤ 40 cm. La redacción no ac
 - **[Seguro]** En el simulador la 3A (lazo abierto) tuvo el mejor cierre real (media low 16.1 cm), mejor que la 3B (58.7) y la 3C (30.1). Eso es lo contrario de lo que se pide en el robot real (E7: 3B mejor que 3A). Aquí no hay derrape de ruedas, que es lo que degrada el lazo abierto en el robot.
 - **[Seguro]** La 3C tuvo menos cierre real medio que la 3B (30.1 contra 58.7 cm). **[Especulando]** Se debe a Ki, pero 3B y 3C difieren también en `bias_w` (0.03 contra 0.05) y las corridas low de una misma prueba varían hasta 28 cm entre sí; con tres corridas no se puede atribuir la diferencia a Ki.
 - **[Probable]** `noise:=medium` empeora algo el cierre real del PID (46.0 y 56.8 cm), pero con una corrida por nivel no se puede separar del ruido entre corridas: la 3B medium cae dentro del rango de sus corridas low y la 3C medium queda 15 cm por encima de su máximo.
-- **E4:** pendiente de la respuesta del docente sobre si la meta de 40 cm es por corrida, por media o por al menos una. Solo la lectura «cada corrida» no se cumple.
+- **E4:** el docente confirmó que se evalúa la media de las tres corridas low: 3C cumple (30.1 cm); 3B no (58.7 cm).
 - **Predicciones:** el cierre `/odom` se sobrestimó en las 3 pruebas (el PID cierra casi perfecto sobre su propia medida). El cierre real se subestimó en 3B (+17 a +69 cm en low) y se sobrestimó en 3A (−10 a −24 cm). No se modificaron.
