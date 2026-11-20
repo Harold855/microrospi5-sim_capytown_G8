@@ -166,9 +166,10 @@ def evaluar(raiz):
     for p in ("3B", "3C"):
         low = filas(hoja, p, "sim", "low")
         vals = [num(f.get("cierre_real_cm")) for f in low]
-        if len(vals) >= 3 and all(v is not None for v in vals) and all(v <= 40.0 for v in vals):
-            cumple.append(p)
-    it.append(Item("E4", "regla: 3B o 3C con cierre REAL <= 40 cm en las 3 corridas low", int(bool(cumple)), 1,
+        # El docente aclaro que la meta se evalua sobre la MEDIA de las tres corridas low (no sobre cada una).
+        if len(vals) >= 3 and all(v is not None for v in vals) and sum(vals) / len(vals) <= 40.0:
+            cumple.append(f"{p} (media {sum(vals) / len(vals):.1f} cm)")
+    it.append(Item("E4", "regla: 3B o 3C con cierre REAL medio <= 40 cm en las 3 corridas low (el docente: se evalua la media)", int(bool(cumple)), 1,
                    "cumple " + "/".join(cumple) if cumple else "sin dato o no cumple"))
 
     # ---- E5: robot real, arranque y giro de 90 grados
