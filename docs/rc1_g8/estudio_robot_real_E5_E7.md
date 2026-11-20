@@ -159,7 +159,7 @@ scripts/rc1_correr.sh <giro|recta|3a|3b> <nombre> [clave=valor …] [--dry-run] 
 - **Calibración:** con `r` y `b_eff` propios no hubo sesgo sistemático; la dispersión es deslizamiento y medida.
 
 ### Registro de E5
-CSV `csv/exp2_real_giro90_*.csv` (copia de `r3` en `exp2_real_giro90.csv`); PNG `plots/exp2_real_giro90_r*.png`; hoja: filas `2 / real` con las predicciones; `rc1_figuras_giro.py` compara predicción y medida.
+CSV `csv/exp2_real_giro90_*.csv` (copia de `r3` en `E5_giro90_real_base.csv`); PNG `plots/exp2_real_giro90_r*.png`; hoja: filas `2 / real` con las predicciones; `rc1_figuras_giro.py` compara predicción y medida.
 
 ---
 
@@ -316,7 +316,7 @@ Estima el avance contra la rúbrica. E6 y E7 cuentan solo las filas con etiqueta
 | El nodo llega a `FIN` | El propio nodo (v = ω = 0 en cada ciclo) | Sí |
 | El nodo muere antes de `FIN` | Nadie: el robot conserva la última orden. `parar()` publica ceros 3 s; la persona usa el interruptor | Parcial |
 | No llega `/odom` en 0.5 s | El nodo (`odom_timeout`) | Por diseño |
-| Ctrl+C | Debería activar `parar()`; con `timeout` sin `--foreground` no llegaba | **`--foreground` aplicado y verificado (`exp1d_real_paro3`)** |
+| Ctrl+C | Debería activar `parar()`; con `timeout` sin `--foreground` no llegaba | **`--foreground` aplicado y verificado (`E6_recta_real_paro3`)** |
 
 ### Lo que hay que contar sin esconderlo
 - **Re-sintonías:** frente a la partida del simulador la configuración final cambia **cinco parámetros** (`kp_yaw`, `kp`, `ki`, `kd`, `kd_yaw`) y el reto permite **tres**. La consulta al docente está pendiente. Las pruebas exploratorias están todas guardadas.

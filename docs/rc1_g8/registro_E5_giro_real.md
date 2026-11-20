@@ -13,12 +13,12 @@ Fecha: 12-nov-2026 (laboratorio, RosCar 4, `ROS_DOMAIN_ID=8`, hora de Perú). Es
 
 | # | Condición | `kp_yaw` | Resultado | Archivo |
 |---|---|---|---|---|
-| A | Ruedas en el aire (sin carga) | 10 | No terminó (93.4 s, estado `GIRA`). Primer pico 105.1°; 106 cambios de signo de `e_yaw`; 7 % del tiempo dentro de ±2° | `csv/exp2_real_giro90_aire.csv` |
-| B | Suelo, cinta de rumbo | 10 | No terminó (9.6 s, cortada). Primer pico 109.9° (+19.9°, 22 %); oscilación de ±15–20°, período ≈ 2.6 s; solo 4 % del tiempo dentro de ±2°. Al cortar `/odom` marcaba 72.4° y el robot siguió girando por la orden pegada | `csv/exp2_real_giro90_run1.csv` |
-| C | Suelo, cinta de rumbo | 1.0 | `FIN`: yaw `/odom` 88.5°, 5.4 s. Físico ≈ 75° (el grupo reporta que las ruedas delanteras hicieron resistencia con el piso) | `csv/exp2_real_giro90_run2.csv` |
+| A | Ruedas en el aire (sin carga) | 10 | No terminó (93.4 s, estado `GIRA`). Primer pico 105.1°; 106 cambios de signo de `e_yaw`; 7 % del tiempo dentro de ±2° | `csv/exploratorias/real/E5_giro90_real_aire.csv` |
+| B | Suelo, cinta de rumbo | 10 | No terminó (9.6 s, cortada). Primer pico 109.9° (+19.9°, 22 %); oscilación de ±15–20°, período ≈ 2.6 s; solo 4 % del tiempo dentro de ±2°. Al cortar `/odom` marcaba 72.4° y el robot siguió girando por la orden pegada | `csv/exploratorias/real/E5_giro90_real_run1.csv` |
+| C | Suelo, cinta de rumbo | 1.0 | `FIN`: yaw `/odom` 88.5°, 5.4 s. Físico ≈ 75° (el grupo reporta que las ruedas delanteras hicieron resistencia con el piso) | `csv/exploratorias/real/E5_giro90_real_run2.csv` |
 
 ### Serie con `kp_yaw` 1.0 (mismo comando; todos con `FIN`)
-Todas escribieron en el mismo archivo (`exp2_real_giro90_cal1.csv`); solo se conserva el de la última. Datos de la terminal:
+Todas escribieron en el mismo archivo (`E5_giro90_real_cal1.csv`); solo se conserva el de la última. Datos de la terminal:
 
 | Corrida | Yaw `/odom` (°) | Tiempo (s) | Error de cierre (cm) |
 |---|---|---|---|
@@ -47,7 +47,7 @@ Resumen de `/odom` en las 10 corridas con `kp_yaw` 1.0 (incluye la C): 88.1° a 
 - Predicciones nuevas para `kp_yaw` 1.0, antes de la corrida oficial de E5.
 
 ## 13-nov-2026 — serie con transportador circular (`kp_yaw` 1.0, mismas ganancias)
-Tres corridas hechas **después** de subir las predicciones de `predicciones_E5_kp1.md` (commit `f9c8336`). Método: transportador circular con el robot colocado en el centro de un cuadrante del piso, ángulo leído al detenerse. Las tres escribieron en el mismo `csv/exp2_real_giro90_cal2.csv` (no se cambió `N`), así que solo se conserva el CSV de la tercera.
+Tres corridas hechas **después** de subir las predicciones de `predicciones_E5_kp1.md` (commit `f9c8336`). Método: transportador circular con el robot colocado en el centro de un cuadrante del piso, ángulo leído al detenerse. Las tres escribieron en el mismo `csv/exploratorias/real/E5_giro90_real_cal2.csv` (no se cambió `N`), así que solo se conserva el CSV de la tercera.
 
 | Corrida | Yaw `/odom` (°) | Tiempo (s) | Error de cierre (cm) | Ángulo físico medido (°) | Error físico (°) |
 |---|---|---|---|---|---|
@@ -81,7 +81,7 @@ El docente respondió que **las tres corridas deben cumplir** el error físico �
 Con la desviación observada (≈ 3.8° en las seis corridas, media 88.2°) y bajo una aproximación normal, la probabilidad de que tres corridas consecutivas queden dentro de ±3° es del orden del 15 % por serie [estimación aproximada]. Para mejorar las probabilidades hay que reducir la dispersión (posicionamiento y lectura del ángulo con un montaje fijo) y el desvío medio (≈ −1.8°), no solo repetir.
 
 ## 13-nov-2026 — corrida adicional (`extra`), exploratoria, con video
-Una corrida adicional con las mismas ganancias (`kp_yaw` 1.0, `kd_yaw` 0.6, `max_angular` 1.0), grabada en video, **no oficial** (la regla del docente exige que las tres corridas de una serie cumplan). Datos de la terminal: `FIN`, error de cierre 0.2 cm, yaw acumulado `/odom` 89.0°, tiempo 5.4 s. Ángulo físico con transportador, reportado por el grupo: **88°** (error 2°). CSV: `csv/exp2_real_giro90_extra.csv` (subido, commit `d3a52d1`). Gráfica: `plots/exp2_real_giro90_extra.png`. Video: `[enlace pendiente]`.
+Una corrida adicional con las mismas ganancias (`kp_yaw` 1.0, `kd_yaw` 0.6, `max_angular` 1.0), grabada en video, **no oficial** (la regla del docente exige que las tres corridas de una serie cumplan). Datos de la terminal: `FIN`, error de cierre 0.2 cm, yaw acumulado `/odom` 89.0°, tiempo 5.4 s. Ángulo físico con transportador, reportado por el grupo: **88°** (error 2°). CSV: `csv/exploratorias/real/E5_giro90_real_extra.csv` (subido, commit `d3a52d1`). Gráfica: `plots/exploratorias/real/E5_giro90_real_extra.png`. Video: `[enlace pendiente]`.
 Del CSV: `FIN` a 5.33 s; pico de `/odom` 88.7° (sin sobreimpulso); primer instante con `|e_yaw|` < 2° a 5.07 s; `w` = 0.000 en `FIN`; **19 inversiones de signo de `w` (|w| ≥ 0.05) en los 2 s previos** (el criterio de la predicción 4, ≤ 2, no se cumple, igual que en `r1`–`r3`; son órdenes pequeñas, no una oscilación visible).
 
 Resumen de las siete corridas con transportador (85°, 90°, 87°, 83°, 93°, 91°, 88°): media 88.1°, desviación ≈ 3.5°; 5 de 7 dentro de ±3° (fallan 85° y 83°; 83° se anotó como «mal posicionado»). Si las corridas fueran independientes con esa tasa (≈ 70 %), la probabilidad de que tres seguidas cumplan sería ≈ 35 % [estimación aproximada con una muestra pequeña; 87° y 93° están justo en el límite y una lectura de ±1° cambia el resultado].
@@ -104,6 +104,6 @@ Respuesta del docente (transcrita por el grupo):
 Corridas de E5 con transportador (todas siguen registradas): 85°, 90°, 87° (serie 1) y 83° (mal posicionado), 93°, 91° (serie oficial) y 88° (corrida adicional con video). Con el criterio de una prueba suficiente, la evidencia de E5 debe citar **una** corrida concreta y, a la vez, listar todas las demás sin ocultar las que quedaron fuera de ±3°.
 
 ## 13-nov-2026 — corrida que acredita E5
-Criterio del docente: una prueba basta. El grupo designa la corrida **r3** (ángulo físico 91°, error 1°, `FIN` a 5.60 s) como evidencia de E5; `csv/exp2_real_giro90.csv` es una copia de `exp2_real_giro90_r3.csv`.
+Criterio del docente: una prueba basta. El grupo designa la corrida **r3** (ángulo físico 91°, error 1°, `FIN` a 5.60 s) como evidencia de E5; `csv/exploratorias/real/E5_giro90_real_base.csv` es una copia de `exp2_real_giro90_r3.csv`.
 Transparencia: r3 **fue elegida entre las corridas medidas con transportador**, no fue la primera ni se fijó antes. Orden cronológico: serie previa (85°, 90°, 87°) → serie oficial (83° mal posicionado, 93°, **91° = r3**) → corrida adicional con video (88°). Siete medidas: media 88.1°, desviación ≈ 3.5°; dos quedaron fuera de ±3° (85° y 83°). La probabilidad de que una corrida cualquiera cumpla es ≈ 70 %, y eso es lo que importa para la corrida en vivo.
 Nota: el video corresponde a la corrida adicional (88°), no a r3.

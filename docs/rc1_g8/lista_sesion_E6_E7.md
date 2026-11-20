@@ -53,7 +53,7 @@ subtitle: "RosCar 4 · ROS_DOMAIN_ID=8 · imprimir y llevar"
 - [ ] **Experimental 1** (ganancias de partida Kp 3, Ki 0.5, Kd 4; predicciones ya subidas):
   `scripts/rc1_correr.sh recta exp1`
 - [ ] Medir con cinta y anotar en la tabla de abajo. Cortar **ya** si el centro se desvía ≈ 30 cm o hay correcciones bruscas (anotar «abortada»).
-- [ ] Copiar el CSV al clon y analizar: `python3 scripts/rc1_analiza_real.py csv/exp1d_real_exp1.csv --criterios e6 --png`
+- [ ] Copiar el CSV al clon y analizar: `python3 scripts/rc1_analiza_real.py csv/exploratorias/real/E6_recta_real_exp01.csv --criterios e6 --png`
 - [ ] **Decidir las ganancias finales** (3 min):
   - Si no oscila y el desvío es < 5 cm → se queda igual.
   - Si oscila → re-sintonía con **un solo parámetro** (candidata: `ki=0.1`); anotar `cambio=...`; queda máximo 2 re-sintonías en la Parte E.

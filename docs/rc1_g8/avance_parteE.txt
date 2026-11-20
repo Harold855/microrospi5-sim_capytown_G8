@@ -79,7 +79,7 @@ g) Datos para predecir E7 (de un modelo con los errores de E5, esquinas independ
 3. QUÉ HAY EN EL REPOSITORIO
 ----------------------------------------------------------------------
 Rama claude/sleepy-knuth-kc6wex del repositorio microrospi5-sim_capytown_G8:
-  - csv/exp2_real_giro90_{aire,run1,run2,cal1,r1,r2,r3,extra}.csv  y  csv/exp2_real_giro90.csv (copia de r3, la corrida que acredita E5)
+  - csv/exploratorias/real/E5_giro90_real_{aire,run1,run2,cal1,extra,base}.csv, csv/exp2_real_giro90_{r1,r2,r3}.csv (oficiales); la base es copia de r3 (copia de r3, la corrida que acredita E5)
   - plots/exp2_real_giro90_{r1,r2,r3,extra}.png                    (gráficas)
   - hoja_resultados.csv  (filas 2 real con predicciones, resultados y notas)
   - config/rc1_pid.yaml  (bloque robot_real con kp_yaw 1.0) y wheel_params_g8.yaml (calibración propia)

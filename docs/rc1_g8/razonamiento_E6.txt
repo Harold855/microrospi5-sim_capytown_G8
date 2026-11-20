@@ -123,7 +123,7 @@ Reglas:
 9. COMANDOS (una corrida; cambiar N cada vez, siempre explícito)
 ----------------------------------------------------------------------
 Verificar las banderas (solo imprime):
-  python3 scripts/rc1_args.py robot_real experimento=recta line_offset=0.10 ki=0.5 log_csv=csv/exp1d_real_exp1.csv
+  python3 scripts/rc1_args.py robot_real experimento=recta line_offset=0.10 ki=0.5 log_csv=csv/exploratorias/real/E6_recta_real_exp01.csv
 Debe salir kp 3.0, ki 0.5, kd 4.0, line_offset 0.1, bias_w 0.0, linear_speed 0.1.
 
 Ejecutar (experimentales: exp1, exp2, exp3; oficiales: run1, run2, run3):
