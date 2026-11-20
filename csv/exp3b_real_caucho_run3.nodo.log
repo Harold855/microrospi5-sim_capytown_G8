@@ -1,5 +1,5 @@
-[INFO] [1795129484.775680814] [cuadrado_controller]: cuadrado_controller listo: cuadrado (pid) kp=1.0 ki=0.1 kd=8.0  v=0.1 m/s. Esperando /odom...
-[INFO] [1795129588.992124066] [cuadrado_controller]: FIN. error de cierre = 1.4 cm, yaw acumulado = 359.7 deg, tiempo = 104.2 s
+[INFO] [1795128230.388652321] [cuadrado_controller]: cuadrado_controller listo: cuadrado (pid) kp=1.0 ki=0.1 kd=8.0  v=0.1 m/s. Esperando /odom...
+[INFO] [1795128333.772021796] [cuadrado_controller]: FIN. error de cierre = 2.5 cm, yaw acumulado = 358.3 deg, tiempo = 103.3 s
 Traceback (most recent call last):
   File "/root/microrospi5-sim_capytown_G8/scripts_pdi/cuadrado_controller.py", line 158, in <module>
     main()

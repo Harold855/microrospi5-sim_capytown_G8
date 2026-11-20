@@ -2,7 +2,7 @@
 
 Con las **mismas ganancias**: ¿qué dio el simulador y qué dio el robot? ¿Qué cambió y por qué? (Anexo A.3 del reto.)
 La columna «Esperábamos» se escribió antes de la sesión de laboratorio (ver `informe.md`, apartado (d)); «Observado» y «Por qué» salen de los CSV y de las medidas con cinta y transportador.
-El 3B real se presenta con las **tres corridas hechas sobre el piso del laboratorio** (`extra8`–`extra10` en el repositorio; `run8`–`run10` en el Pi). Existen además otras corridas de 3B (5 exploratorias en el mismo piso y 6 sobre baldosas de caucho con uniones, más una cortada); están en `csv/` y `hoja_resultados.csv`, y la decisión de qué conjunto cuenta como las tres corridas de 3B la confirma el docente.
+El 3B real se presenta con las **tres corridas oficiales, hechas sobre el piso del laboratorio** (`run1`–`run3` en el repositorio; `run8`–`run10` en el Pi). Se eligieron porque la demostración en vivo se hará en ese mismo piso y el docente podrá compararlas. Las corridas anteriores (3 sobre baldosas de caucho con uniones, que quedaron como `caucho_run1`–`caucho_run3`, más `extra5`–`extra7` en caucho, una cortada y 5 exploratorias en el piso del laboratorio) se conservan en `csv/` y `hoja_resultados.csv` y se catalogan como **error por tipo de suelo**: en el caucho las ruedas se atascaron en las uniones. No cuentan como oficiales.
 
 | Aspecto | Simulador | Robot real | Esperábamos | Observado | Por qué |
 |---|---|---|---|---|---|

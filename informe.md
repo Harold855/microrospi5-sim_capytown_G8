@@ -30,7 +30,7 @@
 
 <img class="fig" src="plots/exp3c_sim_cinta_run2.png" alt="Odometría frente a pose real, 3C run 2">
 
-**Nota sobre 3B.** El 19-nov se hicieron 10 intentos: 1 cortada, 6 sobre baldosas de caucho con uniones que actuaban como baches (34–100 cm; una con interferencia de otro robot) y 3 sobre el piso del laboratorio donde se sintonizó E5 y E6, con un cuadrado de 2 × 2 m como referencia (10.0 / 16.0 / 27.0 cm, las que se presentan). Antes hubo 5 exploratorias en ese piso (19–36 cm); las 7 medidas sobre cerámica promedian 24.4 cm. Todas están en `csv/` y la hoja; el conjunto que cuenta lo confirma el docente.
+**Nota sobre 3B.** El 19-nov se hicieron 10 intentos: 1 cortada, 6 sobre baldosas de caucho con uniones que actuaban como baches (34–100 cm; una con interferencia de otro robot) y 3 sobre el piso del laboratorio, con un cuadrado de 2 × 2 m como referencia (10.0 / 16.0 / 27.0 cm). Las 3 del laboratorio son las **oficiales** (`run1`–`run3`), porque la demostración en vivo será en ese piso; las del caucho se catalogan como error por tipo de suelo y se conservan en `csv/` y la hoja. Antes hubo 5 exploratorias en el laboratorio (19–36 cm); las 7 medidas sobre cerámica promedian 24.4 cm.
 
 ## (d) Por qué cambió el comportamiento al pasar al robot
 
