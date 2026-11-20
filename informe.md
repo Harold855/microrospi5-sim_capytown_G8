@@ -34,13 +34,11 @@
 
 ## (d) Por qué cambió el comportamiento al pasar al robot
 
-- **Motores y retardo:** con `kp_yaw` 10 el giro oscila ±15–20°; `/odom` llega a ≈ 11 Hz, no a 50.
-- **Recta:** Kp y Ki altos oscilan; 1.0 / 0.1 / 8.0 dio 0.5–1.5 cm.
-- **`/odom` no ve el derrape:** su cierre es de ≈ 2 cm y el real, de decenas; el nodo vuelve a anclar cada lado en `/odom` (`core_cuadrado.py`, línea 213).
-- **El piso importa:** caucho con uniones, 34–100 cm; cerámica, 10–36 cm.
-- **Seguridad:** el robot conserva la última orden si el nodo muere; se usa `timeout --foreground` y una persona en el interruptor.
+- **Motores y retardo:** con `kp_yaw` 10 el giro oscila ±15–20° (T ≈ 2.6 s). El retardo efectivo de motores y `/odom` es de ≈ 0.5–0.65 s y el simulador no lo modela. Con `kp_yaw` 1.0 el giro llega a `FIN` en 5.0–8.7 s, frente a 1.01 s en el simulador. `/odom` llega a ≈ 11 Hz, no a 50.
+- **Derivada:** el nodo controla a 30 Hz sobre una pose que cambia cada ≈ 0.09 s y `kd_yaw` da picos en cada muestra nueva: 74 muestras con ω < −0.2 rad/s con 0.6 y 7 con 0.3. Por eso 3B usa 0.3 y E5 se acreditó con 0.6.
+- **Recta:** con Kp 3 / Ki 0.5 oscila (≈ 30 cm; con retardo ≈ 0.7 s un Ki alto desestabiliza); con Kp 1.0 / Ki 0.1 / Kd 8.0, el desvío fue de 0.5–1.5 cm.
+- **`/odom` no ve el derrape** (la calibración `r` 0.03145 y `b_eff` 0.2138 no dejó sesgo: 88.1° ± 3.5°): su cierre es de ≈ 2 cm y el real, de decenas. En 3A la primera esquina giró ≈ 115° en lugar de 90°, y en 3B el giro físico se pasaba 10–15° en varias esquinas mientras `/odom` marcaba ≈ 90°. El nodo vuelve a anclar cada lado en la posición de `/odom` (`core_cuadrado.py`, línea 213), sin referencia física del cuadrado.
+- **El piso importa:** sobre caucho con uniones el cierre fue de 34–100 cm (las uniones atascaban las ruedas); sobre la cerámica del laboratorio, de 10–36 cm.
+- **Seguridad:** el robot conserva la última orden si el nodo muere; se usa `timeout --foreground`.
 - **Transparencia:** las ganancias finales cambian cinco parámetros (máximo tres; consulta pendiente al docente) y se guardaron todas las exploratorias.
-
-## (e) Qué cambiaríamos para el RC-2
-
-Cerrar el giro con el giroscopio (`/imu`), que el robot tiene y no se usa; dar al cuadrado una referencia física en vez de anclar cada lado en `/odom`; controlar a la frecuencia real de `/odom`; y repetir más corridas por configuración en un piso controlado.
+- **RC-2:** giroscopio (`/imu`) para el giro y referencia física para el cuadrado.
